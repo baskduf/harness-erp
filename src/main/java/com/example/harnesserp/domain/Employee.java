@@ -39,6 +39,11 @@ public class Employee {
         return department;
     }
 
+    public void update(String name, String department) {
+        this.name = requireText(name, "name");
+        this.department = requireText(department, "department");
+    }
+
     private static String requireText(String value, String fieldName) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(fieldName + " is required");

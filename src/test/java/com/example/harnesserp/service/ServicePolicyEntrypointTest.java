@@ -13,7 +13,7 @@ class ServicePolicyEntrypointTest {
 
     @Test
     void employeeCreationEntrypointsRequireCallerRole() {
-        assertPublicMutatingEntrypointsRequireRole(EmployeeService.class, "create");
+        assertPublicMutatingEntrypointsRequireRole(EmployeeService.class, "create", "update");
     }
 
     @Test

@@ -8,9 +8,10 @@ Accepted
 
 ERP-005 requires a role-based access policy as documented behavior with a
 minimal code-level policy representation. ERP-006 requires that policy to be
-enforced by public mutating service entrypoints. The tasks explicitly forbid
-adding full Spring Security and require any deferral of runtime security to be
-stated clearly.
+enforced by public mutating service entrypoints. ERP-009 extends the employee
+master-data policy to employee updates. The tasks explicitly forbid adding full
+Spring Security and require any deferral of runtime security to be stated
+clearly.
 
 ## Decision
 
@@ -18,6 +19,7 @@ Add a simple `Role` enum and `AccessPolicy` service that answers whether a role
 may perform these operations:
 
 - `ADMIN` may create employees.
+- `ADMIN` may update employees.
 - `EMPLOYEE` may create purchase requests.
 - `MANAGER` may approve or reject purchase requests.
 
@@ -27,6 +29,7 @@ authentication.
 ERP-006 wires the policy into the service layer:
 
 - Employee creation service calls require an explicit `ADMIN` caller role.
+- Employee update service calls require an explicit `ADMIN` caller role.
 - Purchase request creation service calls require an explicit `EMPLOYEE`
   caller role.
 - Approval and rejection service calls require an explicit `MANAGER` caller

@@ -11,7 +11,7 @@
 - Approval: the record of approving or rejecting a submitted purchase request.
 - Approval decision: either `APPROVED` or `REJECTED`.
 - Role: a documented access-policy identity used by the minimal ERP policy.
-- Admin role: may create employees.
+- Admin role: may create and update employees.
 - Employee role: may create purchase requests.
 - Manager role: may approve or reject purchase requests.
 - Access policy: the tested service-layer policy that maps roles to allowed ERP

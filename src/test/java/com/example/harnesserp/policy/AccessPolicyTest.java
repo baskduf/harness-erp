@@ -17,6 +17,14 @@ class AccessPolicyTest {
     }
 
     @Test
+    void onlyAdminCanUpdateEmployee() {
+        assertThat(accessPolicy.canUpdateEmployee(Role.ADMIN)).isTrue();
+        assertThat(accessPolicy.canUpdateEmployee(Role.EMPLOYEE)).isFalse();
+        assertThat(accessPolicy.canUpdateEmployee(Role.MANAGER)).isFalse();
+        assertThat(accessPolicy.canUpdateEmployee(null)).isFalse();
+    }
+
+    @Test
     void onlyEmployeeCanCreatePurchaseRequest() {
         assertThat(accessPolicy.canCreatePurchaseRequest(Role.EMPLOYEE)).isTrue();
         assertThat(accessPolicy.canCreatePurchaseRequest(Role.ADMIN)).isFalse();

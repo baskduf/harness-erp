@@ -9,6 +9,10 @@ public class AccessPolicy {
         return role == Role.ADMIN;
     }
 
+    public boolean canUpdateEmployee(Role role) {
+        return role == Role.ADMIN;
+    }
+
     public boolean canCreatePurchaseRequest(Role role) {
         return role == Role.EMPLOYEE;
     }
