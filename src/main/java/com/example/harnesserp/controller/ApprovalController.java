@@ -4,6 +4,8 @@ import com.example.harnesserp.dto.ApprovalActionRequest;
 import com.example.harnesserp.dto.ApprovalResponse;
 import com.example.harnesserp.policy.Role;
 import com.example.harnesserp.service.ApprovalService;
+import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +39,11 @@ public class ApprovalController {
             @RequestBody(required = false) ApprovalActionRequest request
     ) {
         return approvalService.reject(callerRole, purchaseRequestId, commentFrom(request));
+    }
+
+    @GetMapping("/approvals")
+    public List<ApprovalResponse> history(@PathVariable Long purchaseRequestId) {
+        return approvalService.history(purchaseRequestId);
     }
 
     private String commentFrom(ApprovalActionRequest request) {

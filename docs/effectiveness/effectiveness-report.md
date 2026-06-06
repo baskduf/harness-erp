@@ -39,6 +39,7 @@ ERP-001 through ERP-005 initial benchmark aggregate.
 | --- | --- | --- | --- |
 | ERP-006 | Enforce service-layer role policy | Existing role/policy code, employee/purchase/approval services and controllers, focused tests, optional glossary/decision update, task outcome, effectiveness report | Policy service exists but is not called by business services |
 | ERP-007 | Add purchase request filtering | Purchase request repository, service, controller, DTOs if needed, focused tests, optional glossary, task outcome, effectiveness report | Combined filters ignore one of the filter fields |
+| ERP-008 | Add approval history read behavior | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | Approval history order is nondeterministic |
 
 ## Results
 
@@ -57,19 +58,19 @@ point.
 
 ## Follow-Up Results
 
-Two follow-up comparable product-task runs have been completed in
+Three follow-up comparable product-task runs have been completed in
 `harness-erp-follow-up-benchmark`. This follow-up benchmark is a separate
 harnessed-only observation and does not show effectiveness improvement without a
 comparison point.
 
 | Metric | Baseline | Follow-up harnessed | Delta |
 | --- | --- | --- | --- |
-| Wrong-file edits | unknown | 0 in 2 tasks | unknown |
-| Repeated mistakes | unknown | 0 in 2 tasks | unknown |
-| First-pass verification success | unknown | 2 of 2 tasks | unknown |
-| Drift violations detected | unknown | 0 in 2 tasks | unknown |
+| Wrong-file edits | unknown | 0 in 3 tasks | unknown |
+| Repeated mistakes | unknown | 0 in 3 tasks | unknown |
+| First-pass verification success | unknown | 3 of 3 tasks | unknown |
+| Drift violations detected | unknown | 0 in 3 tasks | unknown |
 | Human rework minutes | unknown | unknown | unknown |
-| Reverted files | unknown | 0 in 2 tasks | unknown |
+| Reverted files | unknown | 0 in 3 tasks | unknown |
 
 ## Non-Comparable Setup Runs
 
@@ -91,6 +92,7 @@ comparison point.
 | harnessed-only | ERP-005 | 1 | first pass and final pass | Added documented and tested role access policy; runtime HTTP security intentionally deferred |
 | harnessed-only | ERP-006 | 1 | first pass and final pass | Enforced the role access policy at service mutating entrypoints; controllers pass a trusted role header, and runtime HTTP security remains deferred |
 | harnessed-only | ERP-007 | 1 | first pass and final pass | Added repository-backed purchase request filters by employee id, status, and both filters together |
+| harnessed-only | ERP-008 | 1 | first pass and final pass | Added persisted approval history ordered by creation time and approval id |
 
 ## Changed-Files Consistency
 
@@ -104,6 +106,7 @@ comparison point.
 | ERP-005 | Decision record, role type, access-policy service, focused policy tests, optional glossary/AGENTS, task outcome, effectiveness report | `AGENTS.md`, role policy decision, glossary, `AccessPolicy`, `Role`, `AccessPolicyTest`, effectiveness report, ERP-005 task outcome | false |
 | ERP-006 | Existing role/policy code, employee/purchase/approval services and controllers, focused tests, optional glossary/decision update, task outcome, effectiveness report | Employee, purchase request, and approval services/controllers; focused service policy tests; role policy decision; glossary; effectiveness report; ERP-006 task outcome | false |
 | ERP-007 | Purchase request repository, service, controller, DTOs if needed, focused tests, optional glossary, task outcome, effectiveness report | `PurchaseRequestRepository`, `PurchaseRequestService`, `PurchaseRequestController`, `PurchaseRequestServiceTest`, effectiveness report, ERP-007 task outcome | false |
+| ERP-008 | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | `ApprovalRepository`, `ApprovalService`, `ApprovalController`, `ApprovalServiceTest`, effectiveness report, ERP-008 task outcome | false |
 
 ## Source Records
 
@@ -115,6 +118,7 @@ comparison point.
   - `docs/effectiveness/task-outcomes/ERP-005-role-based-access-policy.yaml`
   - `docs/effectiveness/task-outcomes/ERP-006-service-layer-role-policy-enforcement.yaml`
   - `docs/effectiveness/task-outcomes/ERP-007-purchase-request-filtering.yaml`
+  - `docs/effectiveness/task-outcomes/ERP-008-approval-history.yaml`
 - Repository refs compared:
   - ERP-001 start ref: `a1521406f443d3a5a9d2c86bb987658068afafd8`
   - ERP-002 start ref: `9f7ff31bda4c0581eaf6c25a0697240f22b0617f`
@@ -123,6 +127,7 @@ comparison point.
   - ERP-005 start ref: `5a2b849129aabeefdd8c9de4bc4a1534b1050882`
   - ERP-006 start ref: `88ed8cf90afe14f357b0edb0bb8fd966ce524ecc`
   - ERP-007 start ref: `3db120556aca37050ceb5793c5a8153e22a2067f`
+  - ERP-008 start ref: `27a2c60cc241af9ee1d730e4000348ea8cc45d23`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -132,6 +137,7 @@ comparison point.
   - `/Users/wb/Desktop/prompt/05-erp-005-role-based-access-policy.md`
   - `/Users/wb/Desktop/prompt/06-erp-006-service-layer-role-policy-enforcement.md`
   - `/Users/wb/Desktop/prompt/07-erp-007-purchase-request-filtering.md`
+  - `/Users/wb/Desktop/prompt/08-erp-008-approval-history.md`
 - Verification commands compared: `python scripts/check_harness.py`
 
 ## Interpretation
@@ -140,10 +146,11 @@ comparison point.
   ERP-004 included fixture-only edits outside the strict expected file boundary.
   ERP-005 intentionally deferred runtime HTTP security and added only a
   documented/tested policy representation.
-- Follow-up benchmark: ERP-006 and ERP-007 passed first verification in the
+- Follow-up benchmark: ERP-006 through ERP-008 passed first verification in the
   separate `harness-erp-follow-up-benchmark` task group. ERP-006 enforced
   service-layer policy checks while keeping authenticated HTTP runtime security
-  deferred, and ERP-007 added repository-backed purchase request filtering.
+  deferred, ERP-007 added repository-backed purchase request filtering, and
+  ERP-008 added persisted approval history reads.
 - What improved: unknown; no improvement claim is supported by this initial
   harnessed-only benchmark or the follow-up harnessed-only observation.
 - What did not improve: unknown.

@@ -1,0 +1,75 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: 27a2c60cc241af9ee1d730e4000348ea8cc45d23
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: 2026-06-06
+  agent_or_model: Codex in Codex desktop
+  reviewer: unknown
+
+task:
+  id: ERP-008
+  run_id: ERP-008-2026-06-06
+  prompt_summary: Add approval history read behavior with persisted approval records returned in deterministic chronological order.
+  prompt_ref: /Users/wb/Desktop/prompt/08-erp-008-approval-history.md
+  prompt_hash: sha256:03d417f1cd3263b8b97062cbc18e637681298fb2718ec6aeb594966b1ddd45bb
+  comparable_task_group: harness-erp-follow-up-benchmark
+  condition: harnessed-only
+  start_ref: 27a2c60cc241af9ee1d730e4000348ea8cc45d23
+  expected_boundary:
+    - src/main/java/com/example/harnesserp/repository/ApprovalRepository.java
+    - src/main/java/com/example/harnesserp/service/ApprovalService.java
+    - src/main/java/com/example/harnesserp/controller/ApprovalController.java
+    - src/main/java/com/example/harnesserp/dto/ApprovalResponse.java
+    - src/test/java/com/example/harnesserp/service/ApprovalServiceTest.java
+    - docs/domain/glossary.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/ERP-008-approval-history.yaml
+  known_failure_mode: History does not query persisted approval records; unknown purchase requests return empty history; order is nondeterministic.
+
+harness_context:
+  harness_doctor_score: unknown
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    kit_commit: 387dbfabda3d63975494bdabfc812ddf64100919
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - docs/conventions/coding.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_structure.py
+  relevant_memory_records:
+    - docs/decisions/0001-initial-spring-boot-erp-architecture.md
+
+outcome:
+  files_changed:
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/ERP-008-approval-history.yaml
+    - src/main/java/com/example/harnesserp/controller/ApprovalController.java
+    - src/main/java/com/example/harnesserp/repository/ApprovalRepository.java
+    - src/main/java/com/example/harnesserp/service/ApprovalService.java
+    - src/test/java/com/example/harnesserp/service/ApprovalServiceTest.java
+  wrong_file_edits: false
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+    relevant_output: "Tests run: 40, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS"
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  notes: Approval history checks purchase request existence first, then returns persisted approvals ordered by createdAt ascending with id as the tie-breaker.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: none
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: true
