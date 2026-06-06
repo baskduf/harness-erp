@@ -1,6 +1,7 @@
 package com.example.harnesserp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.harnesserp.domain.PurchaseRequestStatus;
 import com.example.harnesserp.dto.CreateEmployeeRequest;
@@ -57,6 +58,34 @@ class PurchaseRequestServiceTest {
         ));
 
         assertThat(purchaseRequest.status()).isEqualTo(PurchaseRequestStatus.SUBMITTED);
+    }
+
+    @Test
+    void rejectsZeroAmountInServiceLayer() {
+        Long employeeId = employee().id();
+
+        assertThatThrownBy(() -> purchaseRequestService.create(new CreatePurchaseRequestRequest(
+                employeeId,
+                "Mouse",
+                BigDecimal.ZERO,
+                null
+        )))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("positive");
+    }
+
+    @Test
+    void rejectsNegativeAmountInServiceLayer() {
+        Long employeeId = employee().id();
+
+        assertThatThrownBy(() -> purchaseRequestService.create(new CreatePurchaseRequestRequest(
+                employeeId,
+                "Mouse",
+                new BigDecimal("-1.00"),
+                null
+        )))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("positive");
     }
 
     private EmployeeResponse employee() {
