@@ -2,6 +2,7 @@ package com.example.harnesserp.controller;
 
 import com.example.harnesserp.dto.CreatePurchaseRequestRequest;
 import com.example.harnesserp.dto.PurchaseRequestResponse;
+import com.example.harnesserp.policy.Role;
 import com.example.harnesserp.service.PurchaseRequestService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +28,11 @@ public class PurchaseRequestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PurchaseRequestResponse create(@Valid @RequestBody CreatePurchaseRequestRequest request) {
-        return purchaseRequestService.create(request);
+    public PurchaseRequestResponse create(
+            @RequestHeader("X-ERP-Role") Role callerRole,
+            @Valid @RequestBody CreatePurchaseRequestRequest request
+    ) {
+        return purchaseRequestService.create(callerRole, request);
     }
 
     @GetMapping

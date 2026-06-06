@@ -14,5 +14,5 @@
 - Admin role: may create employees.
 - Employee role: may create purchase requests.
 - Manager role: may approve or reject purchase requests.
-- Access policy: the tested code-level policy that maps roles to allowed ERP
-  operations; it is not HTTP runtime security.
+- Access policy: the tested service-layer policy that maps roles to allowed ERP
+  operations; it is not HTTP authentication or runtime identity verification.

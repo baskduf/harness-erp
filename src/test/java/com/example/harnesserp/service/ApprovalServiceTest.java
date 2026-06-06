@@ -10,6 +10,8 @@ import com.example.harnesserp.dto.CreateEmployeeRequest;
 import com.example.harnesserp.dto.CreatePurchaseRequestRequest;
 import com.example.harnesserp.dto.EmployeeResponse;
 import com.example.harnesserp.dto.PurchaseRequestResponse;
+import com.example.harnesserp.policy.Role;
+import com.example.harnesserp.repository.ApprovalRepository;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +31,14 @@ class ApprovalServiceTest {
     @Autowired
     private ApprovalService approvalService;
 
+    @Autowired
+    private ApprovalRepository approvalRepository;
+
     @Test
     void approvesSubmittedPurchaseRequest() {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
 
-        ApprovalResponse approval = approvalService.approve(purchaseRequest.id());
+        ApprovalResponse approval = approvalService.approve(Role.MANAGER, purchaseRequest.id(), null);
 
         assertThat(approval.decision()).isEqualTo(ApprovalDecision.APPROVED);
         assertThat(approval.purchaseRequestStatus()).isEqualTo(PurchaseRequestStatus.APPROVED);
@@ -44,7 +49,7 @@ class ApprovalServiceTest {
     void rejectsSubmittedPurchaseRequest() {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
 
-        ApprovalResponse approval = approvalService.reject(purchaseRequest.id());
+        ApprovalResponse approval = approvalService.reject(Role.MANAGER, purchaseRequest.id(), null);
 
         assertThat(approval.decision()).isEqualTo(ApprovalDecision.REJECTED);
         assertThat(approval.purchaseRequestStatus()).isEqualTo(PurchaseRequestStatus.REJECTED);
@@ -56,6 +61,7 @@ class ApprovalServiceTest {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
 
         ApprovalResponse approval = approvalService.approve(
+                Role.MANAGER,
                 purchaseRequest.id(),
                 "Budget confirmed"
         );
@@ -69,6 +75,7 @@ class ApprovalServiceTest {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
 
         ApprovalResponse approval = approvalService.reject(
+                Role.MANAGER,
                 purchaseRequest.id(),
                 "Vendor quote is stale"
         );
@@ -81,7 +88,7 @@ class ApprovalServiceTest {
     void blankApprovalCommentIsNormalizedToNull() {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
 
-        ApprovalResponse approval = approvalService.approve(purchaseRequest.id(), "   ");
+        ApprovalResponse approval = approvalService.approve(Role.MANAGER, purchaseRequest.id(), "   ");
 
         assertThat(approval.comment()).isNull();
     }
@@ -90,7 +97,7 @@ class ApprovalServiceTest {
     void doesNotApproveDraftRequest() {
         PurchaseRequestResponse purchaseRequest = draftRequest();
 
-        assertThatThrownBy(() -> approvalService.approve(purchaseRequest.id()))
+        assertThatThrownBy(() -> approvalService.approve(Role.MANAGER, purchaseRequest.id(), null))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("SUBMITTED");
     }
@@ -99,7 +106,7 @@ class ApprovalServiceTest {
     void doesNotRejectDraftRequest() {
         PurchaseRequestResponse purchaseRequest = draftRequest();
 
-        assertThatThrownBy(() -> approvalService.reject(purchaseRequest.id()))
+        assertThatThrownBy(() -> approvalService.reject(Role.MANAGER, purchaseRequest.id(), null))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("SUBMITTED");
     }
@@ -107,9 +114,9 @@ class ApprovalServiceTest {
     @Test
     void doesNotApproveAlreadyApprovedRequest() {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
-        approvalService.approve(purchaseRequest.id());
+        approvalService.approve(Role.MANAGER, purchaseRequest.id(), null);
 
-        assertThatThrownBy(() -> approvalService.approve(purchaseRequest.id()))
+        assertThatThrownBy(() -> approvalService.approve(Role.MANAGER, purchaseRequest.id(), null))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("SUBMITTED");
     }
@@ -117,32 +124,74 @@ class ApprovalServiceTest {
     @Test
     void doesNotRejectAlreadyRejectedRequest() {
         PurchaseRequestResponse purchaseRequest = submittedRequest();
-        approvalService.reject(purchaseRequest.id());
+        approvalService.reject(Role.MANAGER, purchaseRequest.id(), null);
 
-        assertThatThrownBy(() -> approvalService.reject(purchaseRequest.id()))
+        assertThatThrownBy(() -> approvalService.reject(Role.MANAGER, purchaseRequest.id(), null))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("SUBMITTED");
     }
 
+    @Test
+    void rejectsApprovalForNonManagerBeforePersistingOrChangingStatus() {
+        PurchaseRequestResponse purchaseRequest = submittedRequest();
+        long approvalCount = approvalRepository.count();
+
+        assertThatThrownBy(() -> approvalService.approve(
+                Role.EMPLOYEE,
+                purchaseRequest.id(),
+                "Budget confirmed"
+        ))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("MANAGER");
+
+        assertThat(approvalRepository.count()).isEqualTo(approvalCount);
+        assertThat(purchaseRequestService.get(purchaseRequest.id()).status())
+                .isEqualTo(PurchaseRequestStatus.SUBMITTED);
+    }
+
+    @Test
+    void rejectsRejectionForNonManagerBeforePersistingOrChangingStatus() {
+        PurchaseRequestResponse purchaseRequest = submittedRequest();
+        long approvalCount = approvalRepository.count();
+
+        assertThatThrownBy(() -> approvalService.reject(
+                Role.ADMIN,
+                purchaseRequest.id(),
+                "Vendor quote is stale"
+        ))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("MANAGER");
+
+        assertThat(approvalRepository.count()).isEqualTo(approvalCount);
+        assertThat(purchaseRequestService.get(purchaseRequest.id()).status())
+                .isEqualTo(PurchaseRequestStatus.SUBMITTED);
+    }
+
     private PurchaseRequestResponse submittedRequest() {
-        return purchaseRequestService.create(new CreatePurchaseRequestRequest(
-                employee().id(),
-                "Laptop",
-                new BigDecimal("1200.00"),
-                null
-        ));
+        return purchaseRequestService.create(
+                Role.EMPLOYEE,
+                new CreatePurchaseRequestRequest(
+                        employee().id(),
+                        "Laptop",
+                        new BigDecimal("1200.00"),
+                        null
+                )
+        );
     }
 
     private PurchaseRequestResponse draftRequest() {
-        return purchaseRequestService.create(new CreatePurchaseRequestRequest(
-                employee().id(),
-                "Monitor",
-                new BigDecimal("350.00"),
-                PurchaseRequestStatus.DRAFT
-        ));
+        return purchaseRequestService.create(
+                Role.EMPLOYEE,
+                new CreatePurchaseRequestRequest(
+                        employee().id(),
+                        "Monitor",
+                        new BigDecimal("350.00"),
+                        PurchaseRequestStatus.DRAFT
+                )
+        );
     }
 
     private EmployeeResponse employee() {
-        return employeeService.create(new CreateEmployeeRequest("Ada Lovelace", "Finance"));
+        return employeeService.create(Role.ADMIN, new CreateEmployeeRequest("Ada Lovelace", "Finance"));
     }
 }

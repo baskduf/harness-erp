@@ -4,6 +4,8 @@ import com.example.harnesserp.domain.Employee;
 import com.example.harnesserp.domain.PurchaseRequest;
 import com.example.harnesserp.dto.CreatePurchaseRequestRequest;
 import com.example.harnesserp.dto.PurchaseRequestResponse;
+import com.example.harnesserp.policy.AccessPolicy;
+import com.example.harnesserp.policy.Role;
 import com.example.harnesserp.repository.EmployeeRepository;
 import com.example.harnesserp.repository.PurchaseRequestRepository;
 import java.math.BigDecimal;
@@ -16,17 +18,21 @@ public class PurchaseRequestService {
 
     private final PurchaseRequestRepository purchaseRequestRepository;
     private final EmployeeRepository employeeRepository;
+    private final AccessPolicy accessPolicy;
 
     public PurchaseRequestService(
             PurchaseRequestRepository purchaseRequestRepository,
-            EmployeeRepository employeeRepository
+            EmployeeRepository employeeRepository,
+            AccessPolicy accessPolicy
     ) {
         this.purchaseRequestRepository = purchaseRequestRepository;
         this.employeeRepository = employeeRepository;
+        this.accessPolicy = accessPolicy;
     }
 
     @Transactional
-    public PurchaseRequestResponse create(CreatePurchaseRequestRequest request) {
+    public PurchaseRequestResponse create(Role callerRole, CreatePurchaseRequestRequest request) {
+        requireCanCreatePurchaseRequest(callerRole);
         requirePositiveAmount(request.amount());
 
         Employee employee = employeeRepository.findById(request.employeeId())
@@ -62,6 +68,12 @@ public class PurchaseRequestService {
     private void requirePositiveAmount(BigDecimal amount) {
         if (amount == null || amount.signum() <= 0) {
             throw new BusinessRuleException("Purchase request amount must be positive");
+        }
+    }
+
+    private void requireCanCreatePurchaseRequest(Role callerRole) {
+        if (!accessPolicy.canCreatePurchaseRequest(callerRole)) {
+            throw new BusinessRuleException("EMPLOYEE role is required to create purchase requests");
         }
     }
 }

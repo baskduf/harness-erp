@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.harnesserp.dto.CreateEmployeeRequest;
 import com.example.harnesserp.dto.EmployeeResponse;
+import com.example.harnesserp.policy.Role;
+import com.example.harnesserp.repository.EmployeeRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,13 @@ class EmployeeServiceTest {
     @Autowired
     private EmployeeService employeeService;
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
     @Test
     void createsAndListsEmployees() {
         EmployeeResponse employee = employeeService.create(
+                Role.ADMIN,
                 new CreateEmployeeRequest("Grace Hopper", "Engineering")
         );
 
@@ -34,9 +40,9 @@ class EmployeeServiceTest {
 
     @Test
     void searchesEmployeesByCaseInsensitiveNameSubstring() {
-        employeeService.create(new CreateEmployeeRequest("Ada Lovelace", "Finance"));
-        employeeService.create(new CreateEmployeeRequest("Grace Hopper", "Engineering"));
-        employeeService.create(new CreateEmployeeRequest("Katherine Johnson", "Operations"));
+        employeeService.create(Role.ADMIN, new CreateEmployeeRequest("Ada Lovelace", "Finance"));
+        employeeService.create(Role.ADMIN, new CreateEmployeeRequest("Grace Hopper", "Engineering"));
+        employeeService.create(Role.ADMIN, new CreateEmployeeRequest("Katherine Johnson", "Operations"));
 
         List<EmployeeResponse> lovelaceResults = employeeService.searchByName("lov");
         assertThat(lovelaceResults).hasSize(1);
@@ -52,6 +58,7 @@ class EmployeeServiceTest {
     @Test
     void getsEmployeeDetailWithDepartment() {
         EmployeeResponse created = employeeService.create(
+                Role.ADMIN,
                 new CreateEmployeeRequest("Mary Jackson", "Research")
         );
 
@@ -64,10 +71,25 @@ class EmployeeServiceTest {
     @Test
     void rejectsBlankDepartmentForNewEmployee() {
         assertThatThrownBy(() -> employeeService.create(
+                Role.ADMIN,
                 new CreateEmployeeRequest("Dorothy Vaughan", "   ")
         ))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("department");
+    }
+
+    @Test
+    void rejectsEmployeeCreationForNonAdminBeforePersisting() {
+        long employeeCount = employeeRepository.count();
+
+        assertThatThrownBy(() -> employeeService.create(
+                Role.EMPLOYEE,
+                new CreateEmployeeRequest("Margaret Hamilton", "Engineering")
+        ))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("ADMIN");
+
+        assertThat(employeeRepository.count()).isEqualTo(employeeCount);
     }
 
     @Test

@@ -29,6 +29,16 @@ agent effectiveness.
 | ERP-004 | Add department field to employees | Employee entity, DTOs, service, controller if mapping changes, repository if needed, tests, optional glossary, task outcome, effectiveness report | Field missing from list/search response |
 | ERP-005 | Add role-based access policy as documented behavior | Decision record, role type, access-policy class/service, policy tests, optional glossary/AGENTS, task outcome, effectiveness report | Security behavior claimed without tests or explicit deferral |
 
+## Follow-Up Task Set
+
+ERP-006 onward are tracked as a separate follow-up comparable task group:
+`harness-erp-follow-up-benchmark`. These records are not merged into the
+ERP-001 through ERP-005 initial benchmark aggregate.
+
+| Task ID | Scenario | Expected boundary | Common failure |
+| --- | --- | --- | --- |
+| ERP-006 | Enforce service-layer role policy | Existing role/policy code, employee/purchase/approval services and controllers, focused tests, optional glossary/decision update, task outcome, effectiveness report | Policy service exists but is not called by business services |
+
 ## Results
 
 Five comparable product-task runs have been completed. This is an initial
@@ -43,6 +53,22 @@ point.
 | Drift violations detected | unknown | 0 in 5 tasks | unknown |
 | Human rework minutes | unknown | unknown | unknown |
 | Reverted files | unknown | 0 in 5 tasks | unknown |
+
+## Follow-Up Results
+
+One follow-up comparable product-task run has been completed in
+`harness-erp-follow-up-benchmark`. This follow-up benchmark is a separate
+harnessed-only observation and does not show effectiveness improvement without a
+comparison point.
+
+| Metric | Baseline | Follow-up harnessed | Delta |
+| --- | --- | --- | --- |
+| Wrong-file edits | unknown | 0 in 1 tasks | unknown |
+| Repeated mistakes | unknown | 0 in 1 tasks | unknown |
+| First-pass verification success | unknown | 1 of 1 tasks | unknown |
+| Drift violations detected | unknown | 0 in 1 tasks | unknown |
+| Human rework minutes | unknown | unknown | unknown |
+| Reverted files | unknown | 0 in 1 tasks | unknown |
 
 ## Non-Comparable Setup Runs
 
@@ -62,6 +88,7 @@ point.
 | harnessed-only | ERP-003 | 1 | first pass and final pass | Added persisted approval/rejection comments with blank-to-null normalization; no known boundary drift |
 | harnessed-only | ERP-004 | 1 | first pass and final pass | Added required employee department field; fixture-only updates in approval/purchase tests were outside the strict expected boundary |
 | harnessed-only | ERP-005 | 1 | first pass and final pass | Added documented and tested role access policy; runtime HTTP security intentionally deferred |
+| harnessed-only | ERP-006 | 1 | first pass and final pass | Enforced the role access policy at service mutating entrypoints; controllers pass a trusted role header, and runtime HTTP security remains deferred |
 
 ## Changed-Files Consistency
 
@@ -73,6 +100,7 @@ point.
 | ERP-003 | Approval DTOs, approval service behavior, approval entity, approval response DTO, approval-related tests, task outcome, effectiveness report | `ApprovalController`, `Approval`, `ApprovalActionRequest`, `ApprovalResponse`, `ApprovalService`, `ApprovalServiceTest`, effectiveness report, ERP-003 task outcome | false |
 | ERP-004 | Employee entity, DTOs, service, controller, repository if needed, employee tests, optional glossary, task outcome, effectiveness report | Employee files, `EmployeeServiceTest`, glossary, effectiveness report, ERP-004 task outcome, plus fixture-only edits in `ApprovalServiceTest` and `PurchaseRequestServiceTest` | true |
 | ERP-005 | Decision record, role type, access-policy service, focused policy tests, optional glossary/AGENTS, task outcome, effectiveness report | `AGENTS.md`, role policy decision, glossary, `AccessPolicy`, `Role`, `AccessPolicyTest`, effectiveness report, ERP-005 task outcome | false |
+| ERP-006 | Existing role/policy code, employee/purchase/approval services and controllers, focused tests, optional glossary/decision update, task outcome, effectiveness report | Employee, purchase request, and approval services/controllers; focused service policy tests; role policy decision; glossary; effectiveness report; ERP-006 task outcome | false |
 
 ## Source Records
 
@@ -82,12 +110,14 @@ point.
   - `docs/effectiveness/task-outcomes/ERP-003-approval-comment.yaml`
   - `docs/effectiveness/task-outcomes/ERP-004-employee-department-field.yaml`
   - `docs/effectiveness/task-outcomes/ERP-005-role-based-access-policy.yaml`
+  - `docs/effectiveness/task-outcomes/ERP-006-service-layer-role-policy-enforcement.yaml`
 - Repository refs compared:
   - ERP-001 start ref: `a1521406f443d3a5a9d2c86bb987658068afafd8`
   - ERP-002 start ref: `9f7ff31bda4c0581eaf6c25a0697240f22b0617f`
   - ERP-003 start ref: `d1e5d51916e428fe43fb9cd49145bcfb901c4905`
   - ERP-004 start ref: `638d6d6bc69204bea61a4515004413eb58b9f30d`
   - ERP-005 start ref: `5a2b849129aabeefdd8c9de4bc4a1534b1050882`
+  - ERP-006 start ref: `88ed8cf90afe14f357b0edb0bb8fd966ce524ecc`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -95,6 +125,7 @@ point.
   - `/Users/wb/Desktop/prompt/03-erp-003-approval-comment.md`
   - `/Users/wb/Desktop/prompt/04-erp-004-employee-department-field.md`
   - `/Users/wb/Desktop/prompt/05-erp-005-role-based-access-policy.md`
+  - `/Users/wb/Desktop/prompt/06-erp-006-service-layer-role-policy-enforcement.md`
 - Verification commands compared: `python scripts/check_harness.py`
 
 ## Interpretation
@@ -103,11 +134,15 @@ point.
   ERP-004 included fixture-only edits outside the strict expected file boundary.
   ERP-005 intentionally deferred runtime HTTP security and added only a
   documented/tested policy representation.
+- Follow-up benchmark: ERP-006 passed first verification in the separate
+  `harness-erp-follow-up-benchmark` task group. It enforced service-layer
+  policy checks while keeping authenticated HTTP runtime security deferred.
 - What improved: unknown; no improvement claim is supported by this initial
-  harnessed-only benchmark.
+  harnessed-only benchmark or the follow-up harnessed-only observation.
 - What did not improve: unknown.
-- Confounders or limitations: no baseline exists, all five planned product-task
-  records are complete, and this remains a harnessed-only initial benchmark.
+- Confounders or limitations: no baseline exists, the initial five planned
+  product-task records are complete, and follow-up records are tracked
+  separately from the initial benchmark aggregate.
 - Harness changes to make next: review the completed task outcomes with a human
   reviewer if human rework minutes or qualitative review findings are needed.
 - Human rework interpretation: `unknown` is distinct from `0`; use `unknown`
