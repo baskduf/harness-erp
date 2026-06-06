@@ -73,6 +73,13 @@ ERP-009 are tracked separately as `harness-erp-follow-up-benchmark`. MAINT-001
 is non-comparable maintenance and is excluded from comparable product-task
 counts.
 
+## Design Convention
+
+If a UI is added, use the legacy internal ERP style specified in
+`docs/conventions/legacy-erp-design.md`. The design convention does not add
+HTTP runtime security; `X-ERP-Role` remains a trusted role input for
+service-layer policy checks, and Spring Security is deferred.
+
 ## Notes For Contributors
 
 - Application code lives under `src/main/java/com/example/harnesserp`.

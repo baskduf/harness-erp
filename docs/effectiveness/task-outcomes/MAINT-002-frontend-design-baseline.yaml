@@ -1,0 +1,70 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: bf9725a879a5fc71f0e345bfdfea91ac2bf4dad0
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: 2026-06-06
+  agent_or_model: Codex in Codex desktop
+  reviewer: unknown
+
+task:
+  id: MAINT-002
+  run_id: MAINT-002-2026-06-06
+  prompt_summary: Commit the legacy ERP frontend design baseline as non-comparable maintenance before measurable frontend work.
+  prompt_ref: /Users/wb/Desktop/prompt/11-maint-002-frontend-design-baseline.md
+  prompt_hash: sha256:cde43ebb5d3f5b6e31e8f451b069fa108fc2511d0210eacde59eb203389d8c02
+  comparable_task_group: non-comparable-maintenance
+  condition: non-comparable-maintenance
+  start_ref: bf9725a879a5fc71f0e345bfdfea91ac2bf4dad0
+  expected_boundary:
+    - README.md
+    - docs/conventions/legacy-erp-design.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/MAINT-002-frontend-design-baseline.yaml
+  known_failure_mode: Design rules are added but not committed before frontend work starts; frontend work is mixed into the design-baseline maintenance commit; the maintenance record is accidentally counted as a comparable product task; documentation claims the design convention proves harness effectiveness.
+
+harness_context:
+  harness_doctor_score: unknown
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    kit_commit: 387dbfabda3d63975494bdabfc812ddf64100919
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - docs/conventions/legacy-erp-design.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_structure.py
+    - scripts/check_effectiveness_plan.py
+  relevant_memory_records:
+    - docs/failures/0001-spring-boot-coordinate-resolution.md
+
+outcome:
+  files_changed:
+    - README.md
+    - docs/conventions/legacy-erp-design.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/MAINT-002-frontend-design-baseline.yaml
+  wrong_file_edits: false
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+    relevant_output: "Tests run: 47, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS"
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  notes: Legacy ERP frontend design baseline documented before measurable frontend implementation. This maintenance run does not claim harness effectiveness improvement and does not add HTTP runtime security; X-ERP-Role remains a trusted role input for service-layer policy checks.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: none
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: false

@@ -80,6 +80,7 @@ comparison point.
 | setup-2026-06-06 | Initial ERP MVP, harness adoption, source tracking, and setup verification | Excluded from comparable product-task count |
 | harness-update-2026-06-06 | Refreshed harness-starter-kit source tracking and added effectiveness evidence consistency check | Excluded from comparable product-task count |
 | MAINT-001-ci-verification | Added GitHub Actions CI for the local harness gate as operational maintenance evidence | Excluded from comparable product-task count |
+| MAINT-002-frontend-design-baseline | Added the legacy ERP frontend design convention before measurable frontend product tasks | Excluded from comparable product-task count |
 
 ## Run Log
 
@@ -97,6 +98,7 @@ comparison point.
 | harnessed-only | ERP-008 | 1 | first pass and final pass | Added persisted approval history ordered by creation time and approval id |
 | harnessed-only | ERP-009 | 1 | first pass and final pass | Added ADMIN-only employee update for name and department |
 | non-comparable-maintenance | MAINT-001 | 1 | first pass and final pass | Added GitHub Actions workflow that runs `python scripts/check_harness.py` with Java 21; not counted as comparable product work |
+| non-comparable-maintenance | MAINT-002 | 1 | first pass and final pass | Added legacy ERP frontend design baseline; not counted as comparable product work |
 
 ## Changed-Files Consistency
 
@@ -112,6 +114,7 @@ comparison point.
 | ERP-007 | Purchase request repository, service, controller, DTOs if needed, focused tests, optional glossary, task outcome, effectiveness report | `PurchaseRequestRepository`, `PurchaseRequestService`, `PurchaseRequestController`, `PurchaseRequestServiceTest`, effectiveness report, ERP-007 task outcome | false |
 | ERP-008 | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | `ApprovalRepository`, `ApprovalService`, `ApprovalController`, `ApprovalServiceTest`, effectiveness report, ERP-008 task outcome | false |
 | ERP-009 | Employee entity, DTOs, policy code if needed, service, controller, employee tests, optional glossary/decision update, task outcome, effectiveness report | `Employee`, `UpdateEmployeeRequest`, `AccessPolicy`, `EmployeeService`, `EmployeeController`, employee and policy tests, role policy decision, glossary, effectiveness report, ERP-009 task outcome | false |
+| MAINT-002 | README, legacy ERP design convention, effectiveness report, MAINT-002 task outcome | `README.md`, `docs/conventions/legacy-erp-design.md`, effectiveness report, MAINT-002 task outcome | false |
 
 ## Source Records
 
@@ -149,6 +152,7 @@ comparison point.
 - Verification commands compared: `python scripts/check_harness.py`
 - Non-comparable maintenance outcome records reviewed:
   - `docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml`
+  - `docs/effectiveness/task-outcomes/MAINT-002-frontend-design-baseline.yaml`
 - Maintenance verification commands:
   - `python scripts/check_harness.py`
   - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_effectiveness_plan.py`
@@ -173,8 +177,9 @@ comparison point.
   product-task records are complete, and follow-up records are tracked
   separately from the initial benchmark aggregate.
 - Non-comparable maintenance: MAINT-001 added CI verification for the local
-  harness gate. This is operational evidence only, does not use secrets, and
-  does not increment comparable product-task counts.
+  harness gate. MAINT-002 added the legacy ERP frontend design baseline before
+  measurable frontend work. These are operational and documentation evidence
+  only, do not use secrets, and do not increment comparable product-task counts.
 - Harness changes to make next: review the completed task outcomes with a human
   reviewer if human rework minutes or qualitative review findings are needed.
 - Human rework interpretation: `unknown` is distinct from `0`; use `unknown`
