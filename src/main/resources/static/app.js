@@ -31,7 +31,12 @@
   const state = {
     role: readStoredRole() || "EMPLOYEE",
     activeView: "employees",
-    selectedRows: new Map()
+    selectedRows: new Map(),
+    employees: {
+      rows: [],
+      selectedId: null,
+      lastSearchName: ""
+    }
   };
 
   function setStatus(message, level) {
@@ -179,6 +184,246 @@
     return String(value).replace(/_/g, " ").toUpperCase();
   }
 
+  function employeeElements() {
+    return {
+      rows: document.getElementById("employeeRows"),
+      recordCount: document.getElementById("employeeRecordCount"),
+      searchName: document.getElementById("employeeSearchName"),
+      detailId: document.getElementById("employeeDetailId"),
+      name: document.getElementById("employeeName"),
+      department: document.getElementById("employeeDepartment"),
+      mode: document.getElementById("employeeDetailMode"),
+      form: document.getElementById("employeeForm")
+    };
+  }
+
+  function messageFromError(error) {
+    if (error instanceof ErpApiError) {
+      return error.message;
+    }
+    return "Request failed.";
+  }
+
+  function appendCell(row, text, className, colSpan) {
+    const cell = document.createElement("td");
+    cell.textContent = text;
+    if (className) {
+      cell.className = className;
+    }
+    if (colSpan) {
+      cell.colSpan = colSpan;
+    }
+    row.appendChild(cell);
+    return cell;
+  }
+
+  function renderEmployeePlaceholder(message) {
+    const elements = employeeElements();
+    if (!elements.rows) {
+      return;
+    }
+    const row = document.createElement("tr");
+    appendCell(row, "-", "erp-center");
+    appendCell(row, "unknown", "erp-code");
+    appendCell(row, message, null, 3);
+    elements.rows.replaceChildren(row);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = "0 records";
+    }
+  }
+
+  function renderEmployeeRows(employees) {
+    const elements = employeeElements();
+    if (!elements.rows) {
+      return;
+    }
+    if (!employees.length) {
+      renderEmployeePlaceholder("No rows found.");
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    employees.forEach(function (employee) {
+      const row = document.createElement("tr");
+      const rowKey = "employee-" + employee.id;
+      row.dataset.rowKey = rowKey;
+      row.dataset.employeeId = String(employee.id);
+      if (state.employees.selectedId === employee.id) {
+        row.classList.add("is-selected");
+      }
+      appendCell(row, ">", "erp-center");
+      appendCell(row, formatId("EMP", employee.id), "erp-code");
+      appendCell(row, employee.name || "unknown");
+      appendCell(row, employee.department || "unknown");
+      appendCell(row, "ACTIVE", "erp-code");
+      row.addEventListener("click", function () {
+        loadEmployeeDetail(employee.id);
+      });
+      fragment.appendChild(row);
+    });
+    elements.rows.replaceChildren(fragment);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = employees.length + (employees.length === 1 ? " record" : " records");
+    }
+  }
+
+  function setEmployeeDetail(employee) {
+    const elements = employeeElements();
+    state.employees.selectedId = employee ? employee.id : null;
+    if (elements.detailId) {
+      elements.detailId.value = employee ? formatId("EMP", employee.id) : "new";
+    }
+    if (elements.name) {
+      elements.name.value = employee ? employee.name || "" : "";
+    }
+    if (elements.department) {
+      elements.department.value = employee ? employee.department || "" : "";
+    }
+    if (elements.mode) {
+      elements.mode.value = employee ? "Update" : "Create";
+    }
+    document.querySelectorAll("#employeeRows [data-row-key]").forEach(function (row) {
+      row.classList.toggle("is-selected", employee && row.dataset.employeeId === String(employee.id));
+    });
+  }
+
+  function employeePayload() {
+    const elements = employeeElements();
+    const name = elements.name ? elements.name.value.trim() : "";
+    const department = elements.department ? elements.department.value.trim() : "";
+    if (!name) {
+      setStatus("Required value is missing. [Name]", "error");
+      return null;
+    }
+    if (!department) {
+      setStatus("Required value is missing. [Department]", "error");
+      return null;
+    }
+    return { name: name, department: department };
+  }
+
+  function currentEmployeeSearchName() {
+    const elements = employeeElements();
+    return elements.searchName ? elements.searchName.value.trim() : "";
+  }
+
+  async function loadEmployees(options) {
+    const searchOptions = options || {};
+    const requestedName = searchOptions.name !== undefined
+      ? searchOptions.name.trim()
+      : currentEmployeeSearchName();
+    state.employees.lastSearchName = requestedName;
+    const employees = await apiRequest("/employees", {
+      query: requestedName ? { name: requestedName } : undefined
+    });
+    state.employees.rows = Array.isArray(employees) ? employees : [];
+    renderEmployeeRows(state.employees.rows);
+    if (!searchOptions.silent) {
+      setStatus("Search complete. " + state.employees.rows.length + " records found.", "success");
+    }
+    return state.employees.rows;
+  }
+
+  async function loadEmployeeDetail(employeeId, options) {
+    const detailOptions = options || {};
+    const employee = await apiRequest("/employees/" + encodeURIComponent(employeeId));
+    setEmployeeDetail(employee);
+    selectRow("employees", "employee-" + employee.id);
+    if (!detailOptions.silent) {
+      setStatus("Detail loaded.", "success");
+    }
+    return employee;
+  }
+
+  async function createEmployee() {
+    const payload = employeePayload();
+    if (!payload) {
+      return;
+    }
+    try {
+      const employee = await apiRequest("/employees", {
+        method: "POST",
+        body: payload
+      });
+      await loadEmployees({ name: state.employees.lastSearchName, silent: true });
+      await loadEmployeeDetail(employee.id, { silent: true });
+      setStatus("Saved.", "success");
+    } catch (error) {
+      setStatus(messageFromError(error), "error");
+    }
+  }
+
+  async function updateEmployee() {
+    const selectedId = state.employees.selectedId;
+    if (!selectedId) {
+      setStatus("No row is selected.", "error");
+      return;
+    }
+    const payload = employeePayload();
+    if (!payload) {
+      return;
+    }
+    try {
+      const employee = await apiRequest("/employees/" + encodeURIComponent(selectedId), {
+        method: "PUT",
+        body: payload
+      });
+      await loadEmployees({ name: state.employees.lastSearchName, silent: true });
+      setEmployeeDetail(employee);
+      selectRow("employees", "employee-" + employee.id);
+      setStatus("Saved.", "success");
+    } catch (error) {
+      try {
+        await loadEmployeeDetail(selectedId, { silent: true });
+      } catch (restoreError) {
+        // Keep the original service error visible if detail restore fails.
+      }
+      setStatus(messageFromError(error), "error");
+    }
+  }
+
+  function resetEmployeeSearch() {
+    const elements = employeeElements();
+    if (elements.searchName) {
+      elements.searchName.value = "";
+    }
+    state.employees.lastSearchName = "";
+    loadEmployees({ name: "" }).catch(function (error) {
+      setStatus(messageFromError(error), "error");
+    });
+  }
+
+  function clearEmployeeForm() {
+    setEmployeeDetail(null);
+    setStatus("Ready.", "success");
+  }
+
+  async function handleEmployeeAction(action) {
+    if (action === "list") {
+      const elements = employeeElements();
+      if (elements.searchName) {
+        elements.searchName.value = "";
+      }
+      await loadEmployees({ name: "" });
+    } else if (action === "search") {
+      await loadEmployees();
+    } else if (action === "reset") {
+      resetEmployeeSearch();
+    } else if (action === "new") {
+      clearEmployeeForm();
+    } else if (action === "create") {
+      await createEmployee();
+    } else if (action === "update") {
+      await updateEmployee();
+    } else if (action === "reload") {
+      if (!state.employees.selectedId) {
+        setStatus("No row is selected.", "error");
+        return;
+      }
+      await loadEmployeeDetail(state.employees.selectedId);
+    }
+  }
+
   function showView(viewName) {
     state.activeView = viewName;
     document.querySelectorAll("[data-view]").forEach(function (tab) {
@@ -192,7 +437,26 @@
     setStatus("Workspace ready.", "success");
   }
 
-  function handleCommand(command) {
+  async function handleCommand(command) {
+    if (state.activeView === "employees") {
+      if (command === "search") {
+        await handleEmployeeAction("search");
+        return;
+      }
+      if (command === "new") {
+        await handleEmployeeAction("new");
+        return;
+      }
+      if (command === "save") {
+        await (state.employees.selectedId ? updateEmployee() : createEmployee());
+        return;
+      }
+      if (command === "close") {
+        setStatus("Workspace ready.", "success");
+        return;
+      }
+    }
+
     const messages = {
       search: "No search criteria submitted.",
       reset: "Criteria reset.",
@@ -219,7 +483,25 @@
   function bindToolbar() {
     document.querySelectorAll("[data-command]").forEach(function (button) {
       button.addEventListener("click", function () {
-        handleCommand(button.dataset.command);
+        handleCommand(button.dataset.command).catch(function (error) {
+          setStatus(messageFromError(error), "error");
+        });
+      });
+    });
+  }
+
+  function bindEmployeeScreen() {
+    const elements = employeeElements();
+    if (elements.form) {
+      elements.form.addEventListener("submit", function (event) {
+        event.preventDefault();
+      });
+    }
+    document.querySelectorAll("[data-employee-action]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        handleEmployeeAction(button.dataset.employeeAction).catch(function (error) {
+          setStatus(messageFromError(error), "error");
+        });
       });
     });
   }
@@ -250,10 +532,15 @@
   function init() {
     bindTabs();
     bindToolbar();
+    bindEmployeeScreen();
     bindRoleSelector();
     bindSelectableRows();
     showView(state.activeView);
-    setStatus("Ready.", "success");
+    loadEmployees({ name: "", silent: true }).then(function () {
+      setStatus("Ready.", "success");
+    }).catch(function (error) {
+      setStatus(messageFromError(error), "error");
+    });
   }
 
   window.HarnessERP = {

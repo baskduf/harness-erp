@@ -58,16 +58,17 @@
         <h1>Master Data / Employee Management</h1>
         <div class="erp-panel">
           <div class="erp-panel-title">Search Criteria</div>
-          <div class="erp-form-grid">
-            <label>Employee ID <input class="erp-code-field" type="text" value="" readonly></label>
-            <label>Name <input type="text" value="" readonly></label>
-            <label>Department <input type="text" value="" readonly></label>
-            <button type="button" data-command="search">Search</button>
-            <button type="button" data-command="reset">Reset</button>
+          <div class="erp-form-grid erp-search-grid">
+            <label>Name <input id="employeeSearchName" type="text" autocomplete="off"></label>
+            <label>Employee ID <input id="employeeSearchId" class="erp-code-field" type="text" value="auto" readonly></label>
+            <label>Department <input id="employeeSearchDepartment" type="text" value="all" readonly></label>
+            <button type="button" id="employeeListButton" data-employee-action="list">List All</button>
+            <button type="button" id="employeeSearchButton" data-employee-action="search">Search</button>
+            <button type="button" id="employeeResetButton" data-employee-action="reset">Reset</button>
           </div>
         </div>
         <div class="erp-panel erp-grid-panel">
-          <div class="erp-panel-title">Results</div>
+          <div class="erp-panel-title">Results <span id="employeeRecordCount" class="erp-record-count">0 records</span></div>
           <table class="erp-grid" aria-label="Employee results">
             <thead>
               <tr>
@@ -78,8 +79,8 @@
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
-              <tr data-row-key="employees-empty">
+            <tbody id="employeeRows">
+              <tr>
                 <td class="erp-center">-</td>
                 <td class="erp-code">unknown</td>
                 <td colspan="3">No rows loaded.</td>
@@ -89,12 +90,20 @@
         </div>
         <div class="erp-panel">
           <div class="erp-panel-title">Detail</div>
-          <div class="erp-form-grid erp-detail-grid">
-            <label>Employee ID <input class="erp-code-field" type="text" value="" readonly></label>
-            <label>Name <input type="text" value="" readonly></label>
-            <label>Department <input type="text" value="" readonly></label>
-            <label>Last Updated <input type="text" value="unknown" readonly></label>
-          </div>
+          <form id="employeeForm">
+            <div class="erp-form-grid erp-detail-grid">
+              <label>Employee ID <input id="employeeDetailId" class="erp-code-field" type="text" value="new" readonly></label>
+              <label>Name <input id="employeeName" class="erp-required-field" type="text" autocomplete="off" required></label>
+              <label>Department <input id="employeeDepartment" class="erp-required-field" type="text" autocomplete="off" required></label>
+              <label>Mode <input id="employeeDetailMode" type="text" value="Create" readonly></label>
+            </div>
+            <div class="erp-form-actions">
+              <button type="button" id="employeeNewButton" data-employee-action="new">New</button>
+              <button type="button" id="employeeCreateButton" data-employee-action="create">Create</button>
+              <button type="button" id="employeeUpdateButton" data-employee-action="update">Update</button>
+              <button type="button" id="employeeReloadButton" data-employee-action="reload">Reload Detail</button>
+            </div>
+          </form>
         </div>
       </section>
 

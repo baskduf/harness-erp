@@ -88,6 +88,10 @@ select:disabled {
   background: var(--erp-input-readonly);
 }
 
+.erp-required-field {
+  background: var(--erp-input-required);
+}
+
 .erp-shell {
   display: grid;
   grid-template-rows: 24px 26px 34px 1fr 24px;
@@ -250,6 +254,10 @@ select:disabled {
   grid-template-columns: repeat(4, minmax(150px, 1fr));
 }
 
+.erp-search-grid {
+  grid-template-columns: repeat(3, minmax(160px, 1fr)) repeat(3, max-content);
+}
+
 .erp-form-grid label {
   display: grid;
   grid-template-columns: max-content minmax(88px, 1fr);
@@ -273,6 +281,19 @@ select:disabled {
 .erp-number-field,
 .erp-amount {
   text-align: right;
+}
+
+.erp-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.erp-record-count {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .erp-grid-panel {
@@ -373,7 +394,8 @@ select:disabled {
   }
 
   .erp-form-grid,
-  .erp-detail-grid {
+  .erp-detail-grid,
+  .erp-search-grid {
     grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
 }

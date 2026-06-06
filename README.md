@@ -81,6 +81,10 @@ If a UI is added, use the legacy internal ERP style specified in
 HTTP runtime security; `X-ERP-Role` remains a trusted role input for
 service-layer policy checks, and Spring Security is deferred.
 
+The Employee Management tab can list, search, create, and update employees.
+Use role `ADMIN` for employee create/update calls; non-admin role policy
+denials are shown in the status bar.
+
 ## Notes For Contributors
 
 - Application code lives under `src/main/java/com/example/harnesserp`.
