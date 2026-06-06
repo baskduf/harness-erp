@@ -39,3 +39,10 @@ Before finishing a setup or product-task stage, run `python scripts/check_harnes
 For measurable ERP tasks, preserve the first verification result in the task
 outcome YAML before applying any fixes, then update
 `docs/effectiveness/effectiveness-report.md`.
+
+## Security Policy Caveat
+
+ERP-005 defines and tests a minimal role-based access policy, but full Spring
+Security and request-level runtime authorization are intentionally deferred. Do
+not claim HTTP runtime security exists unless a later task implements and tests
+it.
