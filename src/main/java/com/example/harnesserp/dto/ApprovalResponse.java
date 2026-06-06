@@ -10,6 +10,7 @@ public record ApprovalResponse(
         Long purchaseRequestId,
         ApprovalDecision decision,
         PurchaseRequestStatus purchaseRequestStatus,
+        String comment,
         Instant createdAt
 ) {
     public static ApprovalResponse from(Approval approval) {
@@ -18,6 +19,7 @@ public record ApprovalResponse(
                 approval.getPurchaseRequest().getId(),
                 approval.getDecision(),
                 approval.getPurchaseRequest().getStatus(),
+                approval.getComment(),
                 approval.getCreatedAt()
         );
     }

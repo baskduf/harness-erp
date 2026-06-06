@@ -25,20 +25,30 @@ public class ApprovalService {
 
     @Transactional
     public ApprovalResponse approve(Long purchaseRequestId) {
+        return approve(purchaseRequestId, null);
+    }
+
+    @Transactional
+    public ApprovalResponse approve(Long purchaseRequestId, String comment) {
         PurchaseRequest purchaseRequest = findPurchaseRequest(purchaseRequestId);
         applyApprovalTransition(purchaseRequest);
         Approval approval = approvalRepository.save(
-                new Approval(purchaseRequest, ApprovalDecision.APPROVED)
+                new Approval(purchaseRequest, ApprovalDecision.APPROVED, normalizeComment(comment))
         );
         return ApprovalResponse.from(approval);
     }
 
     @Transactional
     public ApprovalResponse reject(Long purchaseRequestId) {
+        return reject(purchaseRequestId, null);
+    }
+
+    @Transactional
+    public ApprovalResponse reject(Long purchaseRequestId, String comment) {
         PurchaseRequest purchaseRequest = findPurchaseRequest(purchaseRequestId);
         applyRejectionTransition(purchaseRequest);
         Approval approval = approvalRepository.save(
-                new Approval(purchaseRequest, ApprovalDecision.REJECTED)
+                new Approval(purchaseRequest, ApprovalDecision.REJECTED, normalizeComment(comment))
         );
         return ApprovalResponse.from(approval);
     }
@@ -64,5 +74,12 @@ public class ApprovalService {
         } catch (IllegalStateException exception) {
             throw new BusinessRuleException(exception.getMessage(), exception);
         }
+    }
+
+    private String normalizeComment(String comment) {
+        if (comment == null || comment.isBlank()) {
+            return null;
+        }
+        return comment.strip();
     }
 }

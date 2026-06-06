@@ -31,18 +31,18 @@ agent effectiveness.
 
 ## Results
 
-Two comparable product-task runs have been completed. This is an initial
+Three comparable product-task runs have been completed. This is an initial
 harnessed-only observation and does not show improvement without a comparison
 point.
 
 | Metric | Baseline | Harnessed | Delta |
 | --- | --- | --- | --- |
-| Wrong-file edits | unknown | 0 in 2 tasks | unknown |
-| Repeated mistakes | unknown | 0 in 2 tasks | unknown |
-| First-pass verification success | unknown | 2 of 2 tasks | unknown |
-| Drift violations detected | unknown | 0 in 2 tasks | unknown |
+| Wrong-file edits | unknown | 0 in 3 tasks | unknown |
+| Repeated mistakes | unknown | 0 in 3 tasks | unknown |
+| First-pass verification success | unknown | 3 of 3 tasks | unknown |
+| Drift violations detected | unknown | 0 in 3 tasks | unknown |
 | Human rework minutes | unknown | unknown | unknown |
-| Reverted files | unknown | 0 in 2 tasks | unknown |
+| Reverted files | unknown | 0 in 3 tasks | unknown |
 
 ## Non-Comparable Setup Runs
 
@@ -57,6 +57,7 @@ point.
 | harnessed-only | setup | 1 | pass after non-comparable setup fix | Spring Boot coordinate corrected from generated `4.0.6.RELEASE` to resolvable `4.0.6`; setup is excluded from comparable product-task count |
 | harnessed-only | ERP-001 | 1 | first pass and final pass | Added employee search by case-insensitive substring; no known boundary drift |
 | harnessed-only | ERP-002 | 1 | first pass and final pass | Added service-layer positive amount validation; no known boundary drift |
+| harnessed-only | ERP-003 | 1 | first pass and final pass | Added persisted approval/rejection comments with blank-to-null normalization; no known boundary drift |
 
 ## Changed-Files Consistency
 
@@ -65,15 +66,18 @@ point.
 | setup | Setup files and initial ERP MVP | Initial repository contents | Not comparable |
 | ERP-001 | Employee controller, service, repository, DTOs/tests, task outcome, effectiveness report | `EmployeeController`, `EmployeeRepository`, `EmployeeService`, `EmployeeServiceTest`, effectiveness report, ERP-001 task outcome | false |
 | ERP-002 | Purchase request DTOs, service, controller if needed, entity if needed, tests, task outcome, effectiveness report | `CreatePurchaseRequestRequest`, `PurchaseRequestService`, `PurchaseRequestServiceTest`, effectiveness report, ERP-002 task outcome | false |
+| ERP-003 | Approval DTOs, approval service behavior, approval entity, approval response DTO, approval-related tests, task outcome, effectiveness report | `ApprovalController`, `Approval`, `ApprovalActionRequest`, `ApprovalResponse`, `ApprovalService`, `ApprovalServiceTest`, effectiveness report, ERP-003 task outcome | false |
 
 ## Source Records
 
 - Task outcome records reviewed:
   - `docs/effectiveness/task-outcomes/ERP-001-employee-search.yaml`
   - `docs/effectiveness/task-outcomes/ERP-002-purchase-request-amount-validation.yaml`
+  - `docs/effectiveness/task-outcomes/ERP-003-approval-comment.yaml`
 - Repository refs compared:
   - ERP-001 start ref: `a1521406f443d3a5a9d2c86bb987658068afafd8`
   - ERP-002 start ref: `9f7ff31bda4c0581eaf6c25a0697240f22b0617f`
+  - ERP-003 start ref: `d1e5d51916e428fe43fb9cd49145bcfb901c4905`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -85,8 +89,8 @@ point.
 
 ## Interpretation
 
-- Observed benchmark: ERP-001 and ERP-002 passed first verification and stayed
-  within their expected file boundaries.
+- Observed benchmark: ERP-001 through ERP-003 passed first verification and
+  stayed within their expected file boundaries.
 - What improved: unknown; no improvement claim is supported by this initial
   harnessed-only benchmark.
 - What did not improve: unknown.

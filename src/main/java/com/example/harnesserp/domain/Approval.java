@@ -26,15 +26,19 @@ public class Approval {
     @Column(nullable = false)
     private ApprovalDecision decision;
 
+    @Column(name = "decision_comment")
+    private String comment;
+
     @Column(nullable = false)
     private Instant createdAt;
 
     protected Approval() {
     }
 
-    public Approval(PurchaseRequest purchaseRequest, ApprovalDecision decision) {
+    public Approval(PurchaseRequest purchaseRequest, ApprovalDecision decision, String comment) {
         this.purchaseRequest = purchaseRequest;
         this.decision = decision;
+        this.comment = comment;
         this.createdAt = Instant.now();
     }
 
@@ -48,6 +52,10 @@ public class Approval {
 
     public ApprovalDecision getDecision() {
         return decision;
+    }
+
+    public String getComment() {
+        return comment;
     }
 
     public Instant getCreatedAt() {

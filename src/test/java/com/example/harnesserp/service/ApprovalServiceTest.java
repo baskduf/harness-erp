@@ -37,6 +37,7 @@ class ApprovalServiceTest {
 
         assertThat(approval.decision()).isEqualTo(ApprovalDecision.APPROVED);
         assertThat(approval.purchaseRequestStatus()).isEqualTo(PurchaseRequestStatus.APPROVED);
+        assertThat(approval.comment()).isNull();
     }
 
     @Test
@@ -47,6 +48,42 @@ class ApprovalServiceTest {
 
         assertThat(approval.decision()).isEqualTo(ApprovalDecision.REJECTED);
         assertThat(approval.purchaseRequestStatus()).isEqualTo(PurchaseRequestStatus.REJECTED);
+        assertThat(approval.comment()).isNull();
+    }
+
+    @Test
+    void approvingSubmittedPurchaseRequestPersistsCommentInResponse() {
+        PurchaseRequestResponse purchaseRequest = submittedRequest();
+
+        ApprovalResponse approval = approvalService.approve(
+                purchaseRequest.id(),
+                "Budget confirmed"
+        );
+
+        assertThat(approval.decision()).isEqualTo(ApprovalDecision.APPROVED);
+        assertThat(approval.comment()).isEqualTo("Budget confirmed");
+    }
+
+    @Test
+    void rejectingSubmittedPurchaseRequestPersistsCommentInResponse() {
+        PurchaseRequestResponse purchaseRequest = submittedRequest();
+
+        ApprovalResponse approval = approvalService.reject(
+                purchaseRequest.id(),
+                "Vendor quote is stale"
+        );
+
+        assertThat(approval.decision()).isEqualTo(ApprovalDecision.REJECTED);
+        assertThat(approval.comment()).isEqualTo("Vendor quote is stale");
+    }
+
+    @Test
+    void blankApprovalCommentIsNormalizedToNull() {
+        PurchaseRequestResponse purchaseRequest = submittedRequest();
+
+        ApprovalResponse approval = approvalService.approve(purchaseRequest.id(), "   ");
+
+        assertThat(approval.comment()).isNull();
     }
 
     @Test
