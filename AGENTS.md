@@ -40,6 +40,13 @@ For measurable ERP tasks, preserve the first verification result in the task
 outcome YAML before applying any fixes, then update
 `docs/effectiveness/effectiveness-report.md`.
 
+For substantial harness-maintenance work that changes check scripts, command
+workflows, source tracking, effectiveness evidence, first-pass verification
+results, known failure paths, or failed CI/harness checks, record task outcome
+evidence and keep it out of comparable product-task counts. For trivial
+docs-only wording, typo, link-label, or formatting changes, record the skip
+reason in the final report.
+
 ## Security Policy Caveat
 
 ERP-005 defines and tests a minimal role-based access policy, but full Spring

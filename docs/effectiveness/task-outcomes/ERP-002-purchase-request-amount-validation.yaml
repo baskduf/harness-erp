@@ -6,7 +6,7 @@ target:
   stack_or_framework: Java 21 / Spring Boot 4.0.6
   date: 2026-06-06
   agent_or_model: Codex in Codex desktop
-  reviewer: unknown
+  reviewer: Codex in Codex desktop
 
 task:
   id: ERP-002

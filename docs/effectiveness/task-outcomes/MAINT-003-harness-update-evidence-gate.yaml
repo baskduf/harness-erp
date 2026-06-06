@@ -1,0 +1,91 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: 0192d962961427a49c20210b5692aa76ac96d6bd
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: 2026-06-06
+  agent_or_model: Codex in Codex desktop
+  reviewer: Codex in Codex desktop
+
+task:
+  id: MAINT-003
+  run_id: MAINT-003-2026-06-06
+  prompt_summary: Run /harness update, adopt the starter kit evidence-gate update, refresh source tracking, then commit and push.
+  prompt_ref: /Users/wb/Desktop/harness-starter-kit/commands/harness-update.md
+  prompt_hash: sha256:e31f53b919370c643c0a11cf9769ad8cf60bc260f951334fb436e4352277cf8c
+  comparable_task_group: non-comparable-maintenance
+  condition: non-comparable-maintenance
+  start_ref: 0192d962961427a49c20210b5692aa76ac96d6bd
+  expected_boundary:
+    - .harness/source.json
+    - AGENTS.md
+    - scripts/check_effectiveness_plan.py
+    - docs/failures/0002-task-outcome-reviewer-evidence-gap.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/*.yaml
+  known_failure_mode: Harness update refreshes source tracking but misses target-adapted check script changes; stricter evidence validation fails existing included task outcomes; maintenance evidence is counted as comparable product work.
+
+harness_context:
+  harness_doctor_score: unknown
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    previous_kit_commit: 387dbfabda3d63975494bdabfc812ddf64100919
+    kit_commit: 416409d6ab611e23ba73355d539198025fef5ad5
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - /Users/wb/Desktop/harness-starter-kit/commands/harness-update.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_effectiveness_plan.py
+  relevant_memory_records:
+    - docs/failures/0001-spring-boot-coordinate-resolution.md
+    - docs/failures/0002-task-outcome-reviewer-evidence-gap.md
+
+outcome:
+  files_changed:
+    - .harness/source.json
+    - AGENTS.md
+    - scripts/check_effectiveness_plan.py
+    - docs/failures/0002-task-outcome-reviewer-evidence-gap.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/ERP-001-employee-search.yaml
+    - docs/effectiveness/task-outcomes/ERP-002-purchase-request-amount-validation.yaml
+    - docs/effectiveness/task-outcomes/ERP-003-approval-comment.yaml
+    - docs/effectiveness/task-outcomes/ERP-004-employee-department-field.yaml
+    - docs/effectiveness/task-outcomes/ERP-005-role-based-access-policy.yaml
+    - docs/effectiveness/task-outcomes/ERP-006-service-layer-role-policy-enforcement.yaml
+    - docs/effectiveness/task-outcomes/ERP-007-purchase-request-filtering.yaml
+    - docs/effectiveness/task-outcomes/ERP-008-approval-history.yaml
+    - docs/effectiveness/task-outcomes/ERP-009-employee-update.yaml
+    - docs/effectiveness/task-outcomes/FE-001-vanilla-frontend-shell.yaml
+    - docs/effectiveness/task-outcomes/FE-002-employee-management-frontend.yaml
+    - docs/effectiveness/task-outcomes/FE-003-purchase-request-frontend.yaml
+    - docs/effectiveness/task-outcomes/FE-004-approval-workflow-frontend.yaml
+    - docs/effectiveness/task-outcomes/FE-005-full-frontend-api-verification.yaml
+    - docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml
+    - docs/effectiveness/task-outcomes/MAINT-002-frontend-design-baseline.yaml
+    - docs/effectiveness/task-outcomes/MAINT-003-harness-update-evidence-gate.yaml
+  wrong_file_edits: false
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 1
+    result: fail
+    relevant_output: "Maven tests passed with Tests run: 57, Failures: 0, Errors: 0, Skipped: 0; scripts/check_effectiveness_plan.py failed because included task outcomes had reviewer: unknown."
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  notes: This maintenance run updates harness evidence validation and source tracking only. It does not claim harness effectiveness improvement, does not alter frontend API coverage, and does not add HTTP runtime security; X-ERP-Role remains a trusted role input for service-layer policy checks.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: docs/failures/0002-task-outcome-reviewer-evidence-gap.md
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: false
