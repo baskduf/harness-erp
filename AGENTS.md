@@ -49,7 +49,7 @@ reason in the final report.
 
 ## Security Policy Caveat
 
-ERP-005 defines and tests a minimal role-based access policy, but full Spring
-Security and request-level runtime authorization are intentionally deferred. Do
-not claim HTTP runtime security exists unless a later task implements and tests
-it.
+ERP-010 implements Spring Security request-level authorization for mutating
+endpoints using the `X-ERP-Role` role header. Service-layer policy checks remain
+as defense in depth. This is still a local benchmark role input, not
+production-grade user identity, password login, SSO, or per-user authorization.

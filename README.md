@@ -11,8 +11,25 @@ task boundaries, verification, and evidence records stay easy to inspect.
 - Maven wrapper
 - Spring Web MVC
 - Spring Data JPA
+- Spring Security
+- Jackson
 - Jakarta Validation
 - H2 in-memory database
+
+## Functional Scope
+
+The MVP covers a small internal purchasing workflow:
+
+- Employee master data can be listed, searched by name, created, viewed, and
+  updated with a required department.
+- Purchase requests can be created for employees, validated for positive
+  amounts, viewed, and filtered by employee id, status, or both.
+- Submitted purchase requests can be approved or rejected with optional
+  persisted comments.
+- Approval history can be read per purchase request in deterministic creation
+  order.
+- Role policy is enforced at request level by Spring Security and again at
+  service mutating entrypoints.
 
 ## Run Checks
 
@@ -21,6 +38,9 @@ Use the local harness gate before finishing changes:
 ```bash
 python scripts/check_harness.py
 ```
+
+The harness gate runs Maven tests, documentation drift checks, project
+structure checks, and effectiveness evidence checks.
 
 For product-behavior debugging, Maven tests can also be run directly:
 
@@ -39,13 +59,34 @@ runs the same local harness gate on pull requests and pushes to `main`.
 
 The app uses H2 for local and test persistence. No external services, secrets,
 or seed data are required. The static ERP workspace is served from
-`http://localhost:8080/`.
+`http://localhost:8080/`. The local H2 console is enabled for development at
+`http://localhost:8080/h2-console` with JDBC URL
+`jdbc:h2:mem:harness_erp`, user `sa`, and a blank password.
+
+## Static UI
+
+The root page serves a legacy internal ERP workspace with these modules:
+
+- Employee Management: list, search, detail load, create, and update employees.
+- Purchase Requests: list, filter, detail load, create requests, and lookup
+  employees.
+- Approval Queue: list submitted requests and approve or reject them with an
+  optional comment.
+- Approval History: load persisted decision history for a purchase request.
+- Role Policy Reference: show the role values expected by mutating API calls.
+
+Use the role selector in the toolbar to send the `X-ERP-Role` header from the
+UI. Spring Security authorizes mutating endpoints before controller handling,
+and service-level policy denials or business errors are shown in the status
+bar.
 
 ## API Overview
 
-Mutating endpoints accept a trusted `X-ERP-Role` header so the service layer can
-enforce the documented role policy. This header is not authentication, and full
-Spring Security is intentionally deferred.
+Mutating endpoints accept an `X-ERP-Role` header. Spring Security maps that
+local benchmark role input to request authorities and rejects disallowed
+mutating requests before controller handling. The service layer keeps the same
+role policy checks as defense in depth. This is not production-grade user
+identity, password login, or SSO.
 
 | Method | Path | Purpose | Role |
 | --- | --- | --- | --- |
@@ -70,16 +111,17 @@ Harness source tracking and task evidence are kept in:
 - `docs/effectiveness/task-outcomes/`
 
 ERP-001 through ERP-005 are the initial comparable benchmark. ERP-006 through
-ERP-009 are tracked separately as `harness-erp-follow-up-benchmark`. MAINT-001
-is non-comparable maintenance and is excluded from comparable product-task
-counts.
+ERP-010 are tracked separately as `harness-erp-follow-up-benchmark`. MAINT-001
+through MAINT-003 are non-comparable maintenance and are excluded from
+comparable product-task counts. FE-001 through FE-005 are tracked separately as
+`harness-erp-frontend-follow-up`.
 
 ## Design Convention
 
 If a UI is added, use the legacy internal ERP style specified in
-`docs/conventions/legacy-erp-design.md`. The design convention does not add
-HTTP runtime security; `X-ERP-Role` remains a trusted role input for
-service-layer policy checks, and Spring Security is deferred.
+`docs/conventions/legacy-erp-design.md`. The design convention is presentation
+only; runtime endpoint authorization is handled by Spring Security with the
+`X-ERP-Role` header.
 
 The Employee Management tab can list, search, create, and update employees.
 Use role `ADMIN` for employee create/update calls; non-admin role policy

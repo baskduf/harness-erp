@@ -10,9 +10,12 @@
 - Rejected purchase request: a submitted request declined by an approver.
 - Approval: the record of approving or rejecting a submitted purchase request.
 - Approval decision: either `APPROVED` or `REJECTED`.
-- Role: a documented access-policy identity used by the minimal ERP policy.
+- Role: a documented access-policy identity supplied through `X-ERP-Role`.
 - Admin role: may create and update employees.
 - Employee role: may create purchase requests.
 - Manager role: may approve or reject purchase requests.
-- Access policy: the tested service-layer policy that maps roles to allowed ERP
-  operations; it is not HTTP authentication or runtime identity verification.
+- Access policy: the tested policy that maps roles to allowed ERP operations at
+  both Spring Security request authorization and service mutating entrypoints.
+- Role-header authentication: the local benchmark mechanism that maps
+  `X-ERP-Role` to Spring Security authorities; it is not production-grade user
+  identity, password login, or SSO.

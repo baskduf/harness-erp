@@ -11,10 +11,11 @@ The UI should look dated, but the task flow should be clear, fast, and
 operator-friendly. Prioritize search, data grids, keyboard-friendly forms, and
 status feedback over marketing polish.
 
-This specification covers presentation only. Do not claim HTTP runtime security
-or request-level runtime authorization exists. `X-ERP-Role` is a trusted role
-input passed to service-layer policy checks; Spring Security remains deferred
-unless later work implements and tests request-level security.
+This specification covers presentation only. Runtime authorization for mutating
+endpoints is handled by Spring Security as of ERP-010 using the `X-ERP-Role`
+role header, with service-layer policy checks retained as defense in depth. Do
+not claim production-grade user identity, password login, SSO, or per-user
+authorization exists unless later work implements and tests it.
 
 ## Design Principles
 

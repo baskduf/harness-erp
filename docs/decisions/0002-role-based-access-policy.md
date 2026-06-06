@@ -9,9 +9,8 @@ Accepted
 ERP-005 requires a role-based access policy as documented behavior with a
 minimal code-level policy representation. ERP-006 requires that policy to be
 enforced by public mutating service entrypoints. ERP-009 extends the employee
-master-data policy to employee updates. The tasks explicitly forbid adding full
-Spring Security and require any deferral of runtime security to be stated
-clearly.
+master-data policy to employee updates. ERP-010 adds Spring Security
+request-level authorization for mutating HTTP endpoints.
 
 ## Decision
 
@@ -23,8 +22,7 @@ may perform these operations:
 - `EMPLOYEE` may create purchase requests.
 - `MANAGER` may approve or reject purchase requests.
 
-The policy is covered by focused unit tests. It is not wired into HTTP
-authentication.
+The policy is covered by focused unit tests.
 
 ERP-006 wires the policy into the service layer:
 
@@ -36,21 +34,30 @@ ERP-006 wires the policy into the service layer:
   role.
 
 Controllers pass a caller-supplied `X-ERP-Role` header into the service layer so
-the service entrypoints always receive explicit role input. This header is a
-trusted test/API input, not authentication.
+the service entrypoints always receive explicit role input.
 
-## Deferred Runtime Security
+ERP-010 wires the same role matrix into Spring Security:
 
-Full Spring Security, authenticated principals, and request-level authorization
-are intentionally deferred. The application does not verify HTTP caller
-identity in this stage.
+- `RoleHeaderAuthenticationFilter` maps a valid `X-ERP-Role` header to
+  `ROLE_ADMIN`, `ROLE_EMPLOYEE`, or `ROLE_MANAGER`.
+- `SecurityConfig` requires `ADMIN` for employee create/update, `EMPLOYEE` for
+  purchase request creation, and `MANAGER` for approval decisions.
+- Static resources and read endpoints remain public.
+- Service-layer checks remain in place as defense in depth.
+
+## Runtime Security Boundary
+
+The application now has tested Spring Security request-level authorization for
+mutating endpoints. The `X-ERP-Role` header is still a local benchmark role
+input. It is not production-grade user identity, password login, SSO, or
+per-user authorization.
 
 ## Consequences
 
 - The access policy is explicit, testable, and stable for future integration.
 - Mutating service operations cannot be called publicly without explicit role
   input for the documented policy checks.
-- Future security work can wire this policy into authentication and
-  authorization without changing the documented role semantics.
-- Documentation must not claim runtime security exists until a later task adds
-  and verifies it.
+- Mutating HTTP endpoints are blocked by Spring Security before controller
+  handling when the role header is missing or insufficient.
+- Future identity work can replace the role-header input with real
+  authentication without changing the documented role semantics.
