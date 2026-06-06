@@ -38,7 +38,8 @@ runs the same local harness gate on pull requests and pushes to `main`.
 ```
 
 The app uses H2 for local and test persistence. No external services, secrets,
-or seed data are required.
+or seed data are required. The static ERP workspace is served from
+`http://localhost:8080/`.
 
 ## API Overview
 

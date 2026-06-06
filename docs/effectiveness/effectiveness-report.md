@@ -42,6 +42,16 @@ ERP-001 through ERP-005 initial benchmark aggregate.
 | ERP-008 | Add approval history read behavior | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | Approval history order is nondeterministic |
 | ERP-009 | Add employee update behavior | Employee entity, DTOs, policy code if needed, service, controller, employee tests, optional glossary/decision update, task outcome, effectiveness report | Employee update can bypass ADMIN policy validation |
 
+## Frontend Follow-Up Task Set
+
+FE-001 onward are tracked as a separate frontend follow-up comparable task
+group: `harness-erp-frontend-follow-up`. These records are not merged into the
+ERP-001 through ERP-009 backend benchmark aggregates.
+
+| Task ID | Scenario | Expected boundary | Common failure |
+| --- | --- | --- | --- |
+| FE-001 | Add vanilla frontend shell and shared frontend infrastructure | Static frontend resources, optional static-resource test, README if needed, task outcome, effectiveness report | Modern dashboard or landing page replaces the legacy ERP workspace; static files are not served from `/` |
+
 ## Results
 
 Five comparable product-task runs have been completed. This is an initial
@@ -73,6 +83,22 @@ comparison point.
 | Human rework minutes | unknown | unknown | unknown |
 | Reverted files | unknown | 0 in 4 tasks | unknown |
 
+## Frontend Follow-Up Results
+
+One frontend follow-up comparable product-task run has been completed in
+`harness-erp-frontend-follow-up`. This frontend follow-up benchmark is a
+separate harnessed-only observation and does not show effectiveness improvement
+without a comparison point.
+
+| Metric | Baseline | Frontend harnessed | Delta |
+| --- | --- | --- | --- |
+| Wrong-file edits | unknown | 0 in 1 task | unknown |
+| Repeated mistakes | unknown | 0 in 1 task | unknown |
+| First-pass verification success | unknown | 0 of 1 tasks | unknown |
+| Drift violations detected | unknown | 0 in 1 task | unknown |
+| Human rework minutes | unknown | unknown | unknown |
+| Reverted files | unknown | 0 in 1 task | unknown |
+
 ## Non-Comparable Setup Runs
 
 | Run | Reason excluded | Use in metrics |
@@ -99,6 +125,7 @@ comparison point.
 | harnessed-only | ERP-009 | 1 | first pass and final pass | Added ADMIN-only employee update for name and department |
 | non-comparable-maintenance | MAINT-001 | 1 | first pass and final pass | Added GitHub Actions workflow that runs `python scripts/check_harness.py` with Java 21; not counted as comparable product work |
 | non-comparable-maintenance | MAINT-002 | 1 | first pass and final pass | Added legacy ERP frontend design baseline; not counted as comparable product work |
+| harnessed-only | FE-001 | 1 | first pass failed, final pass | Added the vanilla static legacy ERP shell and shared frontend helpers; frontend follow-up group only |
 
 ## Changed-Files Consistency
 
@@ -115,6 +142,7 @@ comparison point.
 | ERP-008 | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | `ApprovalRepository`, `ApprovalService`, `ApprovalController`, `ApprovalServiceTest`, effectiveness report, ERP-008 task outcome | false |
 | ERP-009 | Employee entity, DTOs, policy code if needed, service, controller, employee tests, optional glossary/decision update, task outcome, effectiveness report | `Employee`, `UpdateEmployeeRequest`, `AccessPolicy`, `EmployeeService`, `EmployeeController`, employee and policy tests, role policy decision, glossary, effectiveness report, ERP-009 task outcome | false |
 | MAINT-002 | README, legacy ERP design convention, effectiveness report, MAINT-002 task outcome | `README.md`, `docs/conventions/legacy-erp-design.md`, effectiveness report, MAINT-002 task outcome | false |
+| FE-001 | Static frontend resources, optional static-resource test, README if needed, effectiveness report, FE-001 task outcome | `README.md`, static `index.html`, `styles.css`, `app.js`, `FrontendShellStaticResourceTest`, effectiveness report, FE-001 task outcome | false |
 
 ## Source Records
 
@@ -138,6 +166,7 @@ comparison point.
   - ERP-007 start ref: `3db120556aca37050ceb5793c5a8153e22a2067f`
   - ERP-008 start ref: `27a2c60cc241af9ee1d730e4000348ea8cc45d23`
   - ERP-009 start ref: `25971ff51f9d825571902a8dd5a5c762d3018390`
+  - FE-001 start ref: `0b135f836e8e72c67bf755fb3e5fbb8c865c8ef2`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -149,14 +178,23 @@ comparison point.
   - `/Users/wb/Desktop/prompt/07-erp-007-purchase-request-filtering.md`
   - `/Users/wb/Desktop/prompt/08-erp-008-approval-history.md`
   - `/Users/wb/Desktop/prompt/09-erp-009-employee-update.md`
+  - `/Users/wb/Desktop/prompt/12-fe-001-vanilla-frontend-shell.md`
 - Verification commands compared: `python scripts/check_harness.py`
 - Non-comparable maintenance outcome records reviewed:
   - `docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml`
   - `docs/effectiveness/task-outcomes/MAINT-002-frontend-design-baseline.yaml`
+- Frontend follow-up task outcome records reviewed:
+  - `docs/effectiveness/task-outcomes/FE-001-vanilla-frontend-shell.yaml`
 - Maintenance verification commands:
   - `python scripts/check_harness.py`
   - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_effectiveness_plan.py`
   - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_failure_memory.py`
+- Frontend verification commands:
+  - `python scripts/check_harness.py`
+  - `./mvnw spring-boot:run`
+  - Browser smoke at `http://localhost:8080/`
+  - `curl http://localhost:8080/`
+  - `curl http://localhost:8080/app.js`
 
 ## Interpretation
 
@@ -170,12 +208,18 @@ comparison point.
   deferred, ERP-007 added repository-backed purchase request filtering, and
   ERP-008 added persisted approval history reads. ERP-009 added ADMIN-only
   employee update behavior for name and department.
+- Frontend follow-up benchmark: FE-001 added the vanilla static ERP shell in
+  `harness-erp-frontend-follow-up`. Its first verification failed because the
+  initial static-resource test used `TestRestTemplate`, which was unavailable
+  in this project test classpath; final verification passed after switching the
+  test to JDK `HttpClient`.
 - What improved: unknown; no improvement claim is supported by this initial
-  harnessed-only benchmark or the follow-up harnessed-only observation.
+  harnessed-only benchmark or the follow-up harnessed-only observations.
 - What did not improve: unknown.
 - Confounders or limitations: no baseline exists, the initial five planned
-  product-task records are complete, and follow-up records are tracked
-  separately from the initial benchmark aggregate.
+  product-task records are complete, backend follow-up records are tracked
+  separately from the initial benchmark aggregate, and frontend follow-up
+  records are tracked separately from backend aggregates.
 - Non-comparable maintenance: MAINT-001 added CI verification for the local
   harness gate. MAINT-002 added the legacy ERP frontend design baseline before
   measurable frontend work. These are operational and documentation evidence
@@ -187,7 +231,7 @@ comparison point.
 
 ## Follow-Up
 
-- Next review window: after each measurable ERP task.
+- Next review window: after each measurable ERP or frontend task.
 - Owner or reviewer: unknown.
 - CI follow-up: monitor `.github/workflows/harness-verification.yml` on the
   next push or pull request.

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Harness ERP</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="erp-shell">
+    <header class="erp-title-bar">
+      <div class="erp-title">HARNESS ERP - Operations Workspace [Local]</div>
+      <div class="erp-title-meta">Company: HARNESS | DB: H2</div>
+    </header>
+
+    <nav class="erp-menu-bar" aria-label="Main menu">
+      <button type="button">File</button>
+      <button type="button">Master Data</button>
+      <button type="button">Purchasing</button>
+      <button type="button">Approvals</button>
+      <button type="button">System</button>
+      <button type="button">Help</button>
+    </nav>
+
+    <section class="erp-toolbar" aria-label="Workspace toolbar">
+      <div class="erp-toolbar-actions" role="toolbar" aria-label="Record commands">
+        <button type="button" data-command="search">Search</button>
+        <button type="button" data-command="new">New</button>
+        <button type="button" data-command="save">Save</button>
+        <button type="button" data-command="delete">Delete</button>
+        <button type="button" data-command="approve">Approve</button>
+        <button type="button" data-command="reject">Reject</button>
+        <button type="button" data-command="export">Export</button>
+        <button type="button" data-command="print">Print</button>
+        <button type="button" data-command="close">Close</button>
+      </div>
+      <label class="erp-role-selector">
+        <span>Role</span>
+        <select id="roleSelector" aria-label="Trusted role input">
+          <option value="EMPLOYEE">EMPLOYEE</option>
+          <option value="MANAGER">MANAGER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+      </label>
+    </section>
+
+    <main class="erp-work-area">
+      <div class="erp-tabs" role="tablist" aria-label="ERP workspace modules">
+        <button type="button" class="erp-tab is-active" role="tab" aria-selected="true" data-view="employees">Employee Management</button>
+        <button type="button" class="erp-tab" role="tab" aria-selected="false" data-view="purchaseRequests">Purchase Requests</button>
+        <button type="button" class="erp-tab" role="tab" aria-selected="false" data-view="approvalQueue">Approval Queue</button>
+        <button type="button" class="erp-tab" role="tab" aria-selected="false" data-view="approvalHistory">Approval History</button>
+        <button type="button" class="erp-tab" role="tab" aria-selected="false" data-view="rolePolicy">Role Policy Reference</button>
+      </div>
+
+      <section class="erp-view is-active" id="view-employees" data-view-panel="employees">
+        <h1>Master Data / Employee Management</h1>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Search Criteria</div>
+          <div class="erp-form-grid">
+            <label>Employee ID <input class="erp-code-field" type="text" value="" readonly></label>
+            <label>Name <input type="text" value="" readonly></label>
+            <label>Department <input type="text" value="" readonly></label>
+            <button type="button" data-command="search">Search</button>
+            <button type="button" data-command="reset">Reset</button>
+          </div>
+        </div>
+        <div class="erp-panel erp-grid-panel">
+          <div class="erp-panel-title">Results</div>
+          <table class="erp-grid" aria-label="Employee results">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-row-key="employees-empty">
+                <td class="erp-center">-</td>
+                <td class="erp-code">unknown</td>
+                <td colspan="3">No rows loaded.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Detail</div>
+          <div class="erp-form-grid erp-detail-grid">
+            <label>Employee ID <input class="erp-code-field" type="text" value="" readonly></label>
+            <label>Name <input type="text" value="" readonly></label>
+            <label>Department <input type="text" value="" readonly></label>
+            <label>Last Updated <input type="text" value="unknown" readonly></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="erp-view" id="view-purchaseRequests" data-view-panel="purchaseRequests">
+        <h1>Purchasing / Purchase Requests</h1>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Search Criteria</div>
+          <div class="erp-form-grid">
+            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
+            <label>Employee ID <input class="erp-code-field" type="text" readonly></label>
+            <label>Status <select disabled><option>All</option></select></label>
+            <button type="button" data-command="search">Search</button>
+            <button type="button" data-command="reset">Reset</button>
+          </div>
+        </div>
+        <div class="erp-panel erp-grid-panel">
+          <div class="erp-panel-title">Results</div>
+          <table class="erp-grid" aria-label="Purchase request results">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Request ID</th>
+                <th>Employee ID</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-row-key="purchase-empty">
+                <td class="erp-center">-</td>
+                <td class="erp-code">unknown</td>
+                <td colspan="4">No rows loaded.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Detail</div>
+          <div class="erp-form-grid erp-detail-grid">
+            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
+            <label>Employee ID <input class="erp-code-field" type="text" readonly></label>
+            <label>Amount <input class="erp-number-field" type="text" readonly></label>
+            <label>Status <input class="erp-code-field" type="text" value="unknown" readonly></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="erp-view" id="view-approvalQueue" data-view-panel="approvalQueue">
+        <h1>Approvals / Approval Queue</h1>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Search Criteria</div>
+          <div class="erp-form-grid">
+            <label>Status <select disabled><option>SUBMITTED</option></select></label>
+            <label>Minimum Amount <input class="erp-number-field" type="text" readonly></label>
+            <label>Employee ID <input class="erp-code-field" type="text" readonly></label>
+            <button type="button" data-command="search">Search</button>
+            <button type="button" data-command="reset">Reset</button>
+          </div>
+        </div>
+        <div class="erp-panel erp-grid-panel">
+          <div class="erp-panel-title">Queue</div>
+          <table class="erp-grid" aria-label="Approval queue">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Request ID</th>
+                <th>Employee ID</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-row-key="approval-empty">
+                <td class="erp-center">-</td>
+                <td class="erp-code">unknown</td>
+                <td colspan="4">No rows loaded.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Decision</div>
+          <div class="erp-form-grid erp-detail-grid">
+            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
+            <label>Decision <select disabled><option>unknown</option></select></label>
+            <label>Comment <input type="text" readonly></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="erp-view" id="view-approvalHistory" data-view-panel="approvalHistory">
+        <h1>Approvals / Approval History</h1>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Search Criteria</div>
+          <div class="erp-form-grid">
+            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
+            <label>Decision <select disabled><option>All</option></select></label>
+            <button type="button" data-command="search">Search</button>
+            <button type="button" data-command="reset">Reset</button>
+          </div>
+        </div>
+        <div class="erp-panel erp-grid-panel">
+          <div class="erp-panel-title">History</div>
+          <table class="erp-grid" aria-label="Approval history">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Approval ID</th>
+                <th>Request ID</th>
+                <th>Decision</th>
+                <th>Comment</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-row-key="history-empty">
+                <td class="erp-center">-</td>
+                <td class="erp-code">unknown</td>
+                <td colspan="4">No rows loaded.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="erp-view" id="view-rolePolicy" data-view-panel="rolePolicy">
+        <h1>System / Role Policy Reference</h1>
+        <div class="erp-panel erp-grid-panel">
+          <div class="erp-panel-title">Policy Matrix</div>
+          <table class="erp-grid" aria-label="Role policy reference">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Employee Create</th>
+                <th>Employee Update</th>
+                <th>Purchase Create</th>
+                <th>Approve</th>
+                <th>Reject</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="erp-code">EMPLOYEE</td>
+                <td>deny</td>
+                <td>deny</td>
+                <td>allow</td>
+                <td>deny</td>
+                <td>deny</td>
+              </tr>
+              <tr>
+                <td class="erp-code">MANAGER</td>
+                <td>deny</td>
+                <td>deny</td>
+                <td>deny</td>
+                <td>allow</td>
+                <td>allow</td>
+              </tr>
+              <tr>
+                <td class="erp-code">ADMIN</td>
+                <td>allow</td>
+                <td>allow</td>
+                <td>deny</td>
+                <td>deny</td>
+                <td>deny</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="erp-panel">
+          <div class="erp-panel-title">Security Caveat</div>
+          <p class="erp-note"><code>X-ERP-Role</code> is a trusted request input for service-layer policy checks. Spring Security and request-level runtime authorization are deferred.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="erp-status-bar" id="statusBar" role="status" aria-live="polite">
+      User: local | Role: <span id="statusRole">EMPLOYEE</span> | Company: HARNESS | DB: H2 | Status: Ready.
+    </footer>
+  </div>
+</body>
+</html>
