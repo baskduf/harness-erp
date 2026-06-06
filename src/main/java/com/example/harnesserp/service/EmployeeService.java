@@ -29,4 +29,15 @@ public class EmployeeService {
                 .map(EmployeeResponse::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<EmployeeResponse> searchByName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new BusinessRuleException("Employee search name is required");
+        }
+
+        return employeeRepository.findByNameContainingIgnoreCase(name.strip()).stream()
+                .map(EmployeeResponse::from)
+                .toList();
+    }
 }

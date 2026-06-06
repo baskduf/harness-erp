@@ -31,16 +31,18 @@ agent effectiveness.
 
 ## Results
 
-No comparable product-task runs have been completed yet.
+One comparable product-task run has been completed. This is an initial
+harnessed-only observation and does not show improvement without a comparison
+point.
 
 | Metric | Baseline | Harnessed | Delta |
 | --- | --- | --- | --- |
-| Wrong-file edits | unknown | unknown | unknown |
-| Repeated mistakes | unknown | unknown | unknown |
-| First-pass verification success | unknown | unknown | unknown |
-| Drift violations detected | unknown | unknown | unknown |
+| Wrong-file edits | unknown | 0 in 1 task | unknown |
+| Repeated mistakes | unknown | 0 in 1 task | unknown |
+| First-pass verification success | unknown | 1 of 1 tasks | unknown |
+| Drift violations detected | unknown | 0 in 1 task | unknown |
 | Human rework minutes | unknown | unknown | unknown |
-| Reverted files | unknown | unknown | unknown |
+| Reverted files | unknown | 0 in 1 task | unknown |
 
 ## Non-Comparable Setup Runs
 
@@ -53,17 +55,21 @@ No comparable product-task runs have been completed yet.
 | Condition | Task ID | Run | Verification result | Notes |
 | --- | --- | ---: | --- | --- |
 | harnessed-only | setup | 1 | pass after non-comparable setup fix | Spring Boot coordinate corrected from generated `4.0.6.RELEASE` to resolvable `4.0.6`; setup is excluded from comparable product-task count |
+| harnessed-only | ERP-001 | 1 | first pass and final pass | Added employee search by case-insensitive substring; no known boundary drift |
 
 ## Changed-Files Consistency
 
 | Task ID | Expected boundary | Actual changed files | Wrong-file edit result |
 | --- | --- | --- | --- |
 | setup | Setup files and initial ERP MVP | Initial repository contents | Not comparable |
+| ERP-001 | Employee controller, service, repository, DTOs/tests, task outcome, effectiveness report | `EmployeeController`, `EmployeeRepository`, `EmployeeService`, `EmployeeServiceTest`, effectiveness report, ERP-001 task outcome | false |
 
 ## Source Records
 
-- Task outcome records reviewed: none yet
-- Repository refs compared: none yet
+- Task outcome records reviewed:
+  - `docs/effectiveness/task-outcomes/ERP-001-employee-search.yaml`
+- Repository refs compared:
+  - ERP-001 start ref: `a1521406f443d3a5a9d2c86bb987658068afafd8`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -75,7 +81,8 @@ No comparable product-task runs have been completed yet.
 
 ## Interpretation
 
-- Observed benchmark: no comparable product-task observations yet.
+- Observed benchmark: ERP-001 passed first verification and stayed within the
+  expected file boundary.
 - What improved: unknown; no improvement claim is supported by this initial
   harnessed-only benchmark.
 - What did not improve: unknown.
