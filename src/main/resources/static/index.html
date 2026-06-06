@@ -111,16 +111,25 @@
         <h1>Purchasing / Purchase Requests</h1>
         <div class="erp-panel">
           <div class="erp-panel-title">Search Criteria</div>
-          <div class="erp-form-grid">
-            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
-            <label>Employee ID <input class="erp-code-field" type="text" readonly></label>
-            <label>Status <select disabled><option>All</option></select></label>
-            <button type="button" data-command="search">Search</button>
-            <button type="button" data-command="reset">Reset</button>
+          <div class="erp-form-grid erp-search-grid">
+            <label>Request ID <input id="purchaseFilterRequestId" class="erp-code-field" type="text" value="auto" readonly></label>
+            <label>Employee ID <input id="purchaseFilterEmployeeId" class="erp-code-field" type="number" min="1"></label>
+            <label>Status
+              <select id="purchaseFilterStatus">
+                <option value="">All</option>
+                <option value="DRAFT">DRAFT</option>
+                <option value="SUBMITTED">SUBMITTED</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="REJECTED">REJECTED</option>
+              </select>
+            </label>
+            <button type="button" id="purchaseListButton" data-purchase-action="list">List All</button>
+            <button type="button" id="purchaseSearchButton" data-purchase-action="search">Search</button>
+            <button type="button" id="purchaseResetButton" data-purchase-action="reset">Reset</button>
           </div>
         </div>
         <div class="erp-panel erp-grid-panel">
-          <div class="erp-panel-title">Results</div>
+          <div class="erp-panel-title">Results <span id="purchaseRecordCount" class="erp-record-count">0 records</span></div>
           <table class="erp-grid" aria-label="Purchase request results">
             <thead>
               <tr>
@@ -132,8 +141,8 @@
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
-              <tr data-row-key="purchase-empty">
+            <tbody id="purchaseRows">
+              <tr>
                 <td class="erp-center">-</td>
                 <td class="erp-code">unknown</td>
                 <td colspan="4">No rows loaded.</td>
@@ -143,12 +152,33 @@
         </div>
         <div class="erp-panel">
           <div class="erp-panel-title">Detail</div>
-          <div class="erp-form-grid erp-detail-grid">
-            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
-            <label>Employee ID <input class="erp-code-field" type="text" readonly></label>
-            <label>Amount <input class="erp-number-field" type="text" readonly></label>
-            <label>Status <input class="erp-code-field" type="text" value="unknown" readonly></label>
-          </div>
+          <form id="purchaseForm">
+            <div class="erp-form-grid erp-detail-grid">
+              <label>Request ID <input id="purchaseDetailId" class="erp-code-field" type="text" value="new" readonly></label>
+              <label>Employee ID <input id="purchaseEmployeeId" class="erp-code-field erp-required-field" type="number" min="1" required></label>
+              <label>Employee Lookup
+                <select id="purchaseEmployeeLookup">
+                  <option value="">Select</option>
+                </select>
+              </label>
+              <label>Status
+                <select id="purchaseStatus" class="erp-code-field">
+                  <option value="">Default</option>
+                  <option value="DRAFT">DRAFT</option>
+                  <option value="SUBMITTED">SUBMITTED</option>
+                </select>
+              </label>
+              <label>Description <input id="purchaseDescription" class="erp-required-field" type="text" autocomplete="off" required></label>
+              <label>Amount <input id="purchaseAmount" class="erp-number-field erp-required-field" type="number" min="0.01" step="0.01" required></label>
+              <label>Employee Name <input id="purchaseEmployeeName" type="text" value="unknown" readonly></label>
+              <label>Mode <input id="purchaseDetailMode" type="text" value="Create" readonly></label>
+            </div>
+            <div class="erp-form-actions">
+              <button type="button" id="purchaseNewButton" data-purchase-action="new">New</button>
+              <button type="button" id="purchaseCreateButton" data-purchase-action="create">Create</button>
+              <button type="button" id="purchaseReloadButton" data-purchase-action="reload">Reload Detail</button>
+            </div>
+          </form>
         </div>
       </section>
 

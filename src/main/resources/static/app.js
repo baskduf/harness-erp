@@ -36,6 +36,15 @@
       rows: [],
       selectedId: null,
       lastSearchName: ""
+    },
+    purchaseRequests: {
+      rows: [],
+      selectedId: null,
+      lastFilters: {
+        employeeId: "",
+        status: ""
+      },
+      employeeLookup: []
     }
   };
 
@@ -424,6 +433,292 @@
     }
   }
 
+  function purchaseElements() {
+    return {
+      rows: document.getElementById("purchaseRows"),
+      recordCount: document.getElementById("purchaseRecordCount"),
+      filterEmployeeId: document.getElementById("purchaseFilterEmployeeId"),
+      filterStatus: document.getElementById("purchaseFilterStatus"),
+      detailId: document.getElementById("purchaseDetailId"),
+      employeeId: document.getElementById("purchaseEmployeeId"),
+      employeeLookup: document.getElementById("purchaseEmployeeLookup"),
+      employeeName: document.getElementById("purchaseEmployeeName"),
+      description: document.getElementById("purchaseDescription"),
+      amount: document.getElementById("purchaseAmount"),
+      status: document.getElementById("purchaseStatus"),
+      mode: document.getElementById("purchaseDetailMode"),
+      form: document.getElementById("purchaseForm")
+    };
+  }
+
+  function renderPurchasePlaceholder(message) {
+    const elements = purchaseElements();
+    if (!elements.rows) {
+      return;
+    }
+    const row = document.createElement("tr");
+    appendCell(row, "-", "erp-center");
+    appendCell(row, "unknown", "erp-code");
+    appendCell(row, message, null, 4);
+    elements.rows.replaceChildren(row);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = "0 records";
+    }
+  }
+
+  function renderPurchaseRows(purchaseRequests) {
+    const elements = purchaseElements();
+    if (!elements.rows) {
+      return;
+    }
+    if (!purchaseRequests.length) {
+      renderPurchasePlaceholder("No rows found.");
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    purchaseRequests.forEach(function (purchaseRequest) {
+      const row = document.createElement("tr");
+      const rowKey = "purchase-" + purchaseRequest.id;
+      row.dataset.rowKey = rowKey;
+      row.dataset.purchaseRequestId = String(purchaseRequest.id);
+      if (state.purchaseRequests.selectedId === purchaseRequest.id) {
+        row.classList.add("is-selected");
+      }
+      appendCell(row, ">", "erp-center");
+      appendCell(row, formatId("PR", purchaseRequest.id), "erp-code");
+      appendCell(row, formatId("EMP", purchaseRequest.employeeId), "erp-code");
+      appendCell(row, purchaseRequest.description || "unknown");
+      appendCell(row, formatAmount(purchaseRequest.amount), "erp-amount");
+      appendCell(row, formatStatus(purchaseRequest.status), "erp-code");
+      row.addEventListener("click", function () {
+        loadPurchaseRequestDetail(purchaseRequest.id);
+      });
+      fragment.appendChild(row);
+    });
+    elements.rows.replaceChildren(fragment);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = purchaseRequests.length
+        + (purchaseRequests.length === 1 ? " record" : " records");
+    }
+  }
+
+  function purchaseFiltersFromInputs() {
+    const elements = purchaseElements();
+    const employeeId = elements.filterEmployeeId ? elements.filterEmployeeId.value.trim() : "";
+    const status = elements.filterStatus ? elements.filterStatus.value : "";
+    return {
+      employeeId: employeeId,
+      status: status
+    };
+  }
+
+  function purchaseQueryFromFilters(filters) {
+    const query = {};
+    if (filters.employeeId) {
+      query.employeeId = Number(filters.employeeId);
+    }
+    if (filters.status) {
+      query.status = filters.status;
+    }
+    return query;
+  }
+
+  async function loadPurchaseRequests(options) {
+    const requestOptions = options || {};
+    const filters = requestOptions.filters || purchaseFiltersFromInputs();
+    state.purchaseRequests.lastFilters = {
+      employeeId: filters.employeeId || "",
+      status: filters.status || ""
+    };
+    const query = purchaseQueryFromFilters(state.purchaseRequests.lastFilters);
+    const purchaseRequests = await apiRequest("/purchase-requests", {
+      query: query
+    });
+    state.purchaseRequests.rows = Array.isArray(purchaseRequests) ? purchaseRequests : [];
+    renderPurchaseRows(state.purchaseRequests.rows);
+    if (!requestOptions.silent) {
+      setStatus("Search complete. " + state.purchaseRequests.rows.length + " records found.", "success");
+    }
+    return state.purchaseRequests.rows;
+  }
+
+  function setPurchaseDetail(purchaseRequest) {
+    const elements = purchaseElements();
+    state.purchaseRequests.selectedId = purchaseRequest ? purchaseRequest.id : null;
+    if (elements.detailId) {
+      elements.detailId.value = purchaseRequest ? formatId("PR", purchaseRequest.id) : "new";
+    }
+    if (elements.employeeId) {
+      elements.employeeId.value = purchaseRequest ? purchaseRequest.employeeId : "";
+    }
+    if (elements.employeeLookup) {
+      elements.employeeLookup.value = purchaseRequest ? String(purchaseRequest.employeeId) : "";
+    }
+    if (elements.employeeName) {
+      elements.employeeName.value = purchaseRequest ? purchaseRequest.employeeName || "unknown" : "unknown";
+    }
+    if (elements.description) {
+      elements.description.value = purchaseRequest ? purchaseRequest.description || "" : "";
+    }
+    if (elements.amount) {
+      elements.amount.value = purchaseRequest ? Number(purchaseRequest.amount).toFixed(2) : "";
+    }
+    if (elements.status) {
+      elements.status.value = purchaseRequest
+        && (purchaseRequest.status === "DRAFT" || purchaseRequest.status === "SUBMITTED")
+        ? purchaseRequest.status
+        : "";
+    }
+    if (elements.mode) {
+      elements.mode.value = purchaseRequest ? "Detail" : "Create";
+    }
+    document.querySelectorAll("#purchaseRows [data-row-key]").forEach(function (row) {
+      row.classList.toggle(
+        "is-selected",
+        purchaseRequest && row.dataset.purchaseRequestId === String(purchaseRequest.id)
+      );
+    });
+  }
+
+  async function loadPurchaseRequestDetail(purchaseRequestId, options) {
+    const detailOptions = options || {};
+    const purchaseRequest = await apiRequest(
+      "/purchase-requests/" + encodeURIComponent(purchaseRequestId)
+    );
+    setPurchaseDetail(purchaseRequest);
+    selectRow("purchaseRequests", "purchase-" + purchaseRequest.id);
+    if (!detailOptions.silent) {
+      setStatus("Detail loaded.", "success");
+    }
+    return purchaseRequest;
+  }
+
+  async function loadPurchaseEmployeeLookup() {
+    const elements = purchaseElements();
+    if (!elements.employeeLookup) {
+      return [];
+    }
+    const employees = await apiRequest("/employees");
+    state.purchaseRequests.employeeLookup = Array.isArray(employees) ? employees : [];
+
+    const currentValue = elements.employeeLookup.value;
+    const options = [new Option("Select", "")];
+    state.purchaseRequests.employeeLookup.forEach(function (employee) {
+      options.push(new Option(
+        formatId("EMP", employee.id) + " | " + employee.name,
+        String(employee.id)
+      ));
+    });
+    elements.employeeLookup.replaceChildren.apply(elements.employeeLookup, options);
+    if (currentValue) {
+      elements.employeeLookup.value = currentValue;
+    }
+    return state.purchaseRequests.employeeLookup;
+  }
+
+  function purchasePayload() {
+    const elements = purchaseElements();
+    const employeeId = elements.employeeId ? elements.employeeId.value.trim() : "";
+    const description = elements.description ? elements.description.value.trim() : "";
+    const amountText = elements.amount ? elements.amount.value.trim() : "";
+    const amount = Number(amountText);
+    if (!employeeId) {
+      setStatus("Required value is missing. [Employee ID]", "error");
+      return null;
+    }
+    if (!description) {
+      setStatus("Required value is missing. [Description]", "error");
+      return null;
+    }
+    if (!amountText || Number.isNaN(amount) || amount <= 0) {
+      setStatus("Required value is missing. [Amount]", "error");
+      return null;
+    }
+    const payload = {
+      employeeId: Number(employeeId),
+      description: description,
+      amount: amount
+    };
+    if (elements.status && elements.status.value) {
+      payload.status = elements.status.value;
+    }
+    return payload;
+  }
+
+  async function createPurchaseRequest() {
+    const payload = purchasePayload();
+    if (!payload) {
+      return;
+    }
+    try {
+      const purchaseRequest = await apiRequest("/purchase-requests", {
+        method: "POST",
+        body: payload
+      });
+      await loadPurchaseRequests({ filters: state.purchaseRequests.lastFilters, silent: true });
+      await loadPurchaseRequestDetail(purchaseRequest.id, { silent: true });
+      setStatus("Saved.", "success");
+    } catch (error) {
+      setStatus(messageFromError(error), "error");
+    }
+  }
+
+  function clearPurchaseForm() {
+    setPurchaseDetail(null);
+    setStatus("Ready.", "success");
+  }
+
+  function resetPurchaseFilters() {
+    const elements = purchaseElements();
+    if (elements.filterEmployeeId) {
+      elements.filterEmployeeId.value = "";
+    }
+    if (elements.filterStatus) {
+      elements.filterStatus.value = "";
+    }
+    loadPurchaseRequests({
+      filters: {
+        employeeId: "",
+        status: ""
+      }
+    }).catch(function (error) {
+      setStatus(messageFromError(error), "error");
+    });
+  }
+
+  async function handlePurchaseAction(action) {
+    if (action === "list") {
+      const elements = purchaseElements();
+      if (elements.filterEmployeeId) {
+        elements.filterEmployeeId.value = "";
+      }
+      if (elements.filterStatus) {
+        elements.filterStatus.value = "";
+      }
+      await loadPurchaseRequests({
+        filters: {
+          employeeId: "",
+          status: ""
+        }
+      });
+    } else if (action === "search") {
+      await loadPurchaseRequests();
+    } else if (action === "reset") {
+      resetPurchaseFilters();
+    } else if (action === "new") {
+      clearPurchaseForm();
+    } else if (action === "create") {
+      await createPurchaseRequest();
+    } else if (action === "reload") {
+      if (!state.purchaseRequests.selectedId) {
+        setStatus("No row is selected.", "error");
+        return;
+      }
+      await loadPurchaseRequestDetail(state.purchaseRequests.selectedId);
+    }
+  }
+
   function showView(viewName) {
     state.activeView = viewName;
     document.querySelectorAll("[data-view]").forEach(function (tab) {
@@ -434,6 +729,14 @@
     document.querySelectorAll("[data-view-panel]").forEach(function (panel) {
       panel.classList.toggle("is-active", panel.dataset.viewPanel === viewName);
     });
+    if (viewName === "purchaseRequests") {
+      loadPurchaseEmployeeLookup().catch(function (error) {
+        setStatus(messageFromError(error), "error");
+      });
+      loadPurchaseRequests({ filters: state.purchaseRequests.lastFilters, silent: true }).catch(function (error) {
+        setStatus(messageFromError(error), "error");
+      });
+    }
     setStatus("Workspace ready.", "success");
   }
 
@@ -449,6 +752,24 @@
       }
       if (command === "save") {
         await (state.employees.selectedId ? updateEmployee() : createEmployee());
+        return;
+      }
+      if (command === "close") {
+        setStatus("Workspace ready.", "success");
+        return;
+      }
+    }
+    if (state.activeView === "purchaseRequests") {
+      if (command === "search") {
+        await handlePurchaseAction("search");
+        return;
+      }
+      if (command === "new") {
+        await handlePurchaseAction("new");
+        return;
+      }
+      if (command === "save") {
+        await handlePurchaseAction("create");
         return;
       }
       if (command === "close") {
@@ -506,6 +827,29 @@
     });
   }
 
+  function bindPurchaseScreen() {
+    const elements = purchaseElements();
+    if (elements.form) {
+      elements.form.addEventListener("submit", function (event) {
+        event.preventDefault();
+      });
+    }
+    if (elements.employeeLookup) {
+      elements.employeeLookup.addEventListener("change", function () {
+        if (elements.employeeId) {
+          elements.employeeId.value = elements.employeeLookup.value;
+        }
+      });
+    }
+    document.querySelectorAll("[data-purchase-action]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        handlePurchaseAction(button.dataset.purchaseAction).catch(function (error) {
+          setStatus(messageFromError(error), "error");
+        });
+      });
+    });
+  }
+
   function bindRoleSelector() {
     const selector = document.getElementById("roleSelector");
     if (!selector) {
@@ -533,6 +877,7 @@
     bindTabs();
     bindToolbar();
     bindEmployeeScreen();
+    bindPurchaseScreen();
     bindRoleSelector();
     bindSelectableRows();
     showView(state.activeView);

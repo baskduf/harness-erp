@@ -85,6 +85,10 @@ The Employee Management tab can list, search, create, and update employees.
 Use role `ADMIN` for employee create/update calls; non-admin role policy
 denials are shown in the status bar.
 
+The Purchase Requests tab can list, filter, and create purchase requests. Use
+role `EMPLOYEE` for purchase request creation; non-employee role policy denials
+are shown in the status bar.
+
 ## Notes For Contributors
 
 - Application code lives under `src/main/java/com/example/harnesserp`.
