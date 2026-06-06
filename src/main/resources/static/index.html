@@ -37,7 +37,7 @@
       </div>
       <label class="erp-role-selector">
         <span>Role</span>
-        <select id="roleSelector" aria-label="Trusted role input">
+        <select id="roleSelector" aria-label="Role authorization input">
           <option value="EMPLOYEE">EMPLOYEE</option>
           <option value="MANAGER">MANAGER</option>
           <option value="ADMIN">ADMIN</option>
@@ -317,7 +317,7 @@
         </div>
         <div class="erp-panel">
           <div class="erp-panel-title">Security Caveat</div>
-          <p class="erp-note"><code>X-ERP-Role</code> is a trusted request input for service-layer policy checks. Spring Security and request-level runtime authorization are deferred.</p>
+          <p class="erp-note"><code>X-ERP-Role</code> is mapped to Spring Security authorities for mutating endpoint authorization. It is a local benchmark role input, not production user identity or SSO.</p>
         </div>
       </section>
     </main>
