@@ -54,6 +54,7 @@ ERP-001 through ERP-009 backend benchmark aggregates.
 | FE-002 | Connect employee management frontend to employee APIs | Static frontend resources, optional employee static-resource test, README if needed, task outcome, effectiveness report | Employee forms exist but do not call real APIs; create/update omits `X-ERP-Role` |
 | FE-003 | Connect purchase request frontend to purchase request APIs | Static frontend resources, optional purchase request static-resource test, README if needed, task outcome, effectiveness report | Purchase request controls exist but do not call real APIs; create omits `X-ERP-Role`; combined filters ignore one of the fields |
 | FE-004 | Connect approval queue and history frontend to approval APIs | Static frontend resources, optional approval static-resource test, README if needed, task outcome, effectiveness report | Approval buttons update UI only; comments are not persisted in history; queue does not refresh after decisions |
+| FE-005 | Verify full frontend API coverage | Static frontend resources if gaps are found, optional full coverage static-resource test, README if needed, task outcome, effectiveness report | One or more README APIs are not reachable from the UI or smoke evidence misses persistence |
 
 ## Results
 
@@ -88,19 +89,19 @@ comparison point.
 
 ## Frontend Follow-Up Results
 
-Four frontend follow-up comparable product-task runs have been completed in
+Five frontend follow-up comparable product-task runs have been completed in
 `harness-erp-frontend-follow-up`. This frontend follow-up benchmark is a
 separate harnessed-only observation and does not show effectiveness improvement
 without a comparison point.
 
 | Metric | Baseline | Frontend harnessed | Delta |
 | --- | --- | --- | --- |
-| Wrong-file edits | unknown | 0 in 4 tasks | unknown |
-| Repeated mistakes | unknown | 0 in 4 tasks | unknown |
-| First-pass verification success | unknown | 2 of 4 tasks | unknown |
-| Drift violations detected | unknown | 0 in 4 tasks | unknown |
+| Wrong-file edits | unknown | 0 in 5 tasks | unknown |
+| Repeated mistakes | unknown | 0 in 5 tasks | unknown |
+| First-pass verification success | unknown | 3 of 5 tasks | unknown |
+| Drift violations detected | unknown | 0 in 5 tasks | unknown |
 | Human rework minutes | unknown | unknown | unknown |
-| Reverted files | unknown | 0 in 4 tasks | unknown |
+| Reverted files | unknown | 0 in 5 tasks | unknown |
 
 ## Non-Comparable Setup Runs
 
@@ -132,6 +133,7 @@ without a comparison point.
 | harnessed-only | FE-002 | 1 | first pass and final pass | Connected Employee Management to real employee APIs with ADMIN mutating role header and status-bar errors; frontend follow-up group only |
 | harnessed-only | FE-003 | 1 | first pass failed, final pass | Connected Purchase Requests to real list/filter/detail/create APIs and employee lookup; first pass failed on a brittle static test assertion; frontend follow-up group only |
 | harnessed-only | FE-004 | 1 | first pass and final pass | Connected Approval Queue and Approval History to real approval APIs with MANAGER decisions and persisted comments; frontend follow-up group only |
+| harnessed-only | FE-005 | 1 | first pass and final pass | Added full frontend API coverage static-resource evidence and smoke-verified every README API; frontend follow-up group only |
 
 ## Changed-Files Consistency
 
@@ -152,6 +154,7 @@ without a comparison point.
 | FE-002 | Static frontend resources, optional employee static-resource test, README if needed, effectiveness report, FE-002 task outcome | `README.md`, static `index.html`, `styles.css`, `app.js`, `EmployeeFrontendStaticResourceTest`, effectiveness report, FE-002 task outcome | false |
 | FE-003 | Static frontend resources, optional purchase request static-resource test, README if needed, effectiveness report, FE-003 task outcome | `README.md`, static `index.html`, `app.js`, `PurchaseRequestFrontendStaticResourceTest`, effectiveness report, FE-003 task outcome | false |
 | FE-004 | Static frontend resources, optional approval static-resource test, README if needed, effectiveness report, FE-004 task outcome | `README.md`, static `index.html`, `app.js`, `ApprovalFrontendStaticResourceTest`, effectiveness report, FE-004 task outcome | false |
+| FE-005 | Static frontend resources if gaps are found, optional full coverage static-resource test, README if needed, effectiveness report, FE-005 task outcome | `FullFrontendApiCoverageStaticResourceTest`, effectiveness report, FE-005 task outcome | false |
 
 ## Source Records
 
@@ -179,6 +182,7 @@ without a comparison point.
   - FE-002 start ref: `7aefb7ca4b7e96c990edd4f9131c815be46779fa`
   - FE-003 start ref: `38a0c44c96bff0d146de1ce03249fa580b1c35f3`
   - FE-004 start ref: `4b906d7125e7c3163b455546ced2c7d46b988a8c`
+  - FE-005 start ref: `2907544e9aab0ddecb545dee5b9336b0a27af953`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -194,6 +198,7 @@ without a comparison point.
   - `/Users/wb/Desktop/prompt/13-fe-002-employee-management-frontend.md`
   - `/Users/wb/Desktop/prompt/14-fe-003-purchase-request-frontend.md`
   - `/Users/wb/Desktop/prompt/15-fe-004-approval-workflow-frontend.md`
+  - `/Users/wb/Desktop/prompt/16-fe-005-full-frontend-api-verification.md`
 - Verification commands compared: `python scripts/check_harness.py`
 - Non-comparable maintenance outcome records reviewed:
   - `docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml`
@@ -203,6 +208,7 @@ without a comparison point.
   - `docs/effectiveness/task-outcomes/FE-002-employee-management-frontend.yaml`
   - `docs/effectiveness/task-outcomes/FE-003-purchase-request-frontend.yaml`
   - `docs/effectiveness/task-outcomes/FE-004-approval-workflow-frontend.yaml`
+  - `docs/effectiveness/task-outcomes/FE-005-full-frontend-api-verification.yaml`
 - Maintenance verification commands:
   - `python scripts/check_harness.py`
   - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_effectiveness_plan.py`
@@ -243,6 +249,22 @@ without a comparison point.
   approve, reject, and approval-history APIs, including MANAGER role decisions,
   persisted comments, queue refresh after decisions, empty history display for
   existing requests without approvals, and visible status-bar service errors.
+  FE-005 added final static-resource coverage evidence and full browser-smoke
+  verification that every README API is reachable from the vanilla frontend:
+  employee create/update/list/search/detail, purchase create/list/filter/detail,
+  approval approve/reject, and approval history. Mutating calls continue to use
+  `X-ERP-Role` as a trusted service-layer role input only.
+- Frontend API coverage summary: all README APIs were covered in FE-005 smoke:
+  `POST /employees`, `PUT /employees/{employeeId}`, `GET /employees`,
+  `GET /employees?name={name}`, `GET /employees/{employeeId}`,
+  `POST /purchase-requests`, `GET /purchase-requests`,
+  `GET /purchase-requests?employeeId={employeeId}`,
+  `GET /purchase-requests?status={status}`,
+  `GET /purchase-requests?employeeId={employeeId}&status={status}`,
+  `GET /purchase-requests/{purchaseRequestId}`,
+  `POST /purchase-requests/{purchaseRequestId}/approve`,
+  `POST /purchase-requests/{purchaseRequestId}/reject`, and
+  `GET /purchase-requests/{purchaseRequestId}/approvals`.
 - What improved: unknown; no improvement claim is supported by this initial
   harnessed-only benchmark or the follow-up harnessed-only observations.
 - What did not improve: unknown.

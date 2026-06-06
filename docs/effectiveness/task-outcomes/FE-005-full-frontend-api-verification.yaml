@@ -1,0 +1,144 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: 2907544e9aab0ddecb545dee5b9336b0a27af953
+  stack_or_framework: Java 21 / Spring Boot 4.0.6 with vanilla HTML/CSS/JavaScript static resources
+  date: 2026-06-06
+  agent_or_model: Codex in Codex desktop
+  reviewer: unknown
+
+task:
+  id: FE-005
+  run_id: FE-005-2026-06-06
+  prompt_summary: Verify full vanilla frontend API integration coverage for every API listed in README.md.
+  prompt_ref: /Users/wb/Desktop/prompt/16-fe-005-full-frontend-api-verification.md
+  prompt_hash: sha256:ee994e30a5d13e662b98f0ac49b832b00e3e50cecc9c9d93227391c42a877573
+  comparable_task_group: harness-erp-frontend-follow-up
+  condition: harnessed-only
+  start_ref: 2907544e9aab0ddecb545dee5b9336b0a27af953
+  expected_boundary:
+    - src/main/resources/static/index.html
+    - src/main/resources/static/styles.css
+    - src/main/resources/static/app.js
+    - src/test/java/com/example/harnesserp/FullFrontendApiCoverageStaticResourceTest.java
+    - README.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/FE-005-full-frontend-api-verification.yaml
+  known_failure_mode: One or more README APIs are not reachable from the UI; smoke checks only verify page load; UI reports success before API persistence is verified; role header behavior is confused with authentication; frontend evidence is merged into backend ERP aggregates.
+
+harness_context:
+  harness_doctor_score: unknown
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    kit_commit: 387dbfabda3d63975494bdabfc812ddf64100919
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - docs/conventions/legacy-erp-design.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_structure.py
+    - scripts/check_effectiveness_plan.py
+  relevant_memory_records:
+    - docs/failures/0001-spring-boot-coordinate-resolution.md
+    - docs/conventions/legacy-erp-design.md
+
+outcome:
+  files_changed:
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/FE-005-full-frontend-api-verification.yaml
+    - src/test/java/com/example/harnesserp/FullFrontendApiCoverageStaticResourceTest.java
+  wrong_file_edits: false
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+    relevant_output: "Tests run: 57, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS"
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  api_coverage:
+    - method: POST
+      path: /employees
+      required_role_or_header: "X-ERP-Role: ADMIN"
+      ui_action: Employee Management create button with role selector set to ADMIN.
+      result: covered; smoke created employee `EMP-00001`.
+    - method: PUT
+      path: /employees/{employeeId}
+      required_role_or_header: "X-ERP-Role: ADMIN"
+      ui_action: Employee Management update button after row selection/detail load.
+      result: covered; smoke updated employee name and department, then verified EMPLOYEE-role denial.
+    - method: GET
+      path: /employees
+      required_role_or_header: none
+      ui_action: Employee Management List All.
+      result: covered; smoke listed the created employee.
+    - method: GET
+      path: /employees?name={name}
+      required_role_or_header: none
+      ui_action: Employee Management name search.
+      result: covered; smoke searched by the created employee name.
+    - method: GET
+      path: /employees/{employeeId}
+      required_role_or_header: none
+      ui_action: Employee result row selection and detail reload.
+      result: covered; smoke selected the employee row and populated detail fields.
+    - method: POST
+      path: /purchase-requests
+      required_role_or_header: "X-ERP-Role: EMPLOYEE"
+      ui_action: Purchase Requests create button with role selector set to EMPLOYEE.
+      result: covered; smoke created one DRAFT and two SUBMITTED requests, then verified ADMIN-role denial.
+    - method: GET
+      path: /purchase-requests
+      required_role_or_header: none
+      ui_action: Purchase Requests List All.
+      result: covered; smoke listed draft and submitted requests together.
+    - method: GET
+      path: /purchase-requests?employeeId={employeeId}
+      required_role_or_header: none
+      ui_action: Purchase Requests employee id filter.
+      result: covered; smoke filtered all requests for the created employee.
+    - method: GET
+      path: /purchase-requests?status={status}
+      required_role_or_header: none
+      ui_action: Purchase Requests status filter.
+      result: covered; smoke filtered submitted requests and excluded the draft.
+    - method: GET
+      path: /purchase-requests?employeeId={employeeId}&status={status}
+      required_role_or_header: none
+      ui_action: Purchase Requests combined employee id and status filter.
+      result: covered; smoke returned both submitted requests for the created employee and excluded the draft.
+    - method: GET
+      path: /purchase-requests/{purchaseRequestId}
+      required_role_or_header: none
+      ui_action: Purchase request result row selection/detail load.
+      result: covered; smoke loaded submitted request detail.
+    - method: POST
+      path: /purchase-requests/{purchaseRequestId}/approve
+      required_role_or_header: "X-ERP-Role: MANAGER"
+      ui_action: Approval Queue approve button with nonblank comment.
+      result: covered; smoke verified EMPLOYEE-role denial, then approved as MANAGER and saw persisted approval history.
+    - method: POST
+      path: /purchase-requests/{purchaseRequestId}/reject
+      required_role_or_header: "X-ERP-Role: MANAGER"
+      ui_action: Approval Queue reject button with nonblank comment.
+      result: covered; smoke verified EMPLOYEE-role denial, then rejected as MANAGER and saw persisted rejection history.
+    - method: GET
+      path: /purchase-requests/{purchaseRequestId}/approvals
+      required_role_or_header: none
+      ui_action: Approval History search by purchase request id.
+      result: covered; smoke loaded approval and rejection history with approval id, request id, decision, comment, and creation time.
+  notes: Browser smoke on `http://localhost:8080/` created an employee as ADMIN, listed employees, searched by name, selected the employee row, loaded detail, updated employee name and department as ADMIN, and verified EMPLOYEE-role update denial. It created one draft and two submitted purchase requests as EMPLOYEE, listed all requests, filtered by employee id, status, and combined filters, loaded purchase request detail, and verified ADMIN-role purchase create denial. It verified EMPLOYEE-role approve and reject denials, then approved and rejected submitted requests as MANAGER with nonblank comments and loaded persisted history for both requests. Status messages were visible, the layout overflow scan found no shell/toolbar/tab/button overflow at the tested viewport, and browser console errors were empty.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: none
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: true
