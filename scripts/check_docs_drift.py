@@ -22,6 +22,7 @@ REQUIRED_FILES = [
     "docs/failures/README.md",
     "docs/effectiveness/effectiveness-report.md",
     "docs/effectiveness/task-outcomes/task-outcome-template.yaml",
+    "scripts/check_effectiveness_plan.py",
 ]
 
 
@@ -65,6 +66,18 @@ def main() -> int:
     for expected_text in required_effectiveness_text:
         if expected_text not in effectiveness:
             return fail(f"effectiveness report missing {expected_text}")
+
+    adoption = (ROOT / "docs/harness/adoption-report.md").read_text(
+        encoding="utf-8"
+    )
+    required_adoption_text = [
+        "python scripts/check_effectiveness_plan.py",
+        "387dbfabda3d63975494bdabfc812ddf64100919",
+        "/harness update",
+    ]
+    for expected_text in required_adoption_text:
+        if expected_text not in adoption:
+            return fail(f"adoption report missing {expected_text}")
 
     template = (
         ROOT / "docs/effectiveness/task-outcomes/task-outcome-template.yaml"

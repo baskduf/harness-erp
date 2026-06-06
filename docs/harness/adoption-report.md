@@ -22,8 +22,8 @@
 - `docs/`: harness adoption report, Harness Doctor setup baseline, coding
   conventions, domain glossary, decision records, failure memory, effectiveness
   report, and task outcome records.
-- `scripts/`: `check_harness.py`, `check_docs_drift.py`, and
-  `check_structure.py`.
+- `scripts/`: `check_harness.py`, `check_docs_drift.py`,
+  `check_structure.py`, and `check_effectiveness_plan.py`.
 - `src/`: minimal Spring Boot ERP MVP and staged ERP-001 through ERP-005
   product-task implementations.
 
@@ -58,7 +58,7 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 
 - Harness-starter-kit path: `/Users/wb/Desktop/harness-starter-kit`
 - Harness-starter-kit remote: `https://github.com/baskduf/harness-starter-kit.git`
-- Harness-starter-kit commit: `f06600e2baaadcc0930573409c850c11a3168ace`
+- Harness-starter-kit commit: `387dbfabda3d63975494bdabfc812ddf64100919`
 - Source tracking file: `.harness/source.json`
 - Applied profile: `spring`
 - Read-only reference material: yes
@@ -89,6 +89,8 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 - `/Users/wb/Desktop/harness-starter-kit/docs/templates/effectiveness-report.md`
 - `/Users/wb/Desktop/harness-starter-kit/docs/templates/adoption-report.md`
 - `/Users/wb/Desktop/harness-starter-kit/commands/harness-doctor.md`
+- `/Users/wb/Desktop/harness-starter-kit/commands/harness-update.md`
+- `/Users/wb/Desktop/harness-starter-kit/scripts/check_effectiveness_plan.py`
 
 ## Profile Absorption
 
@@ -116,6 +118,7 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
   - `./mvnw test`
   - `python scripts/check_docs_drift.py`
   - `python scripts/check_structure.py`
+  - `python scripts/check_effectiveness_plan.py`
 - Focused or manual checks outside the normal gate:
   - Running the Spring Boot server manually for interactive API use.
   - Harness Doctor baseline, which is harness health evidence only.
@@ -226,6 +229,8 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 
 - Baseline doc or structure hygiene checks: `scripts/check_docs_drift.py` and
   `scripts/check_structure.py`.
+- Effectiveness evidence consistency check:
+  `scripts/check_effectiveness_plan.py`.
 - Encoding or localization hygiene checks: ASCII-only convention documented;
   no separate encoding checker was needed for this Java MVP.
 - Target-specific architecture checks: `scripts/check_structure.py` checks
@@ -233,6 +238,21 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
   boundary.
 - Not added: CI drift checks were deferred because the benchmark required local
   verification only.
+
+## Harness Update 2026-06-06
+
+- Command: `/harness update`
+- Previous kit commit: `f06600e2baaadcc0930573409c850c11a3168ace`
+- Updated kit commit: `387dbfabda3d63975494bdabfc812ddf64100919`
+- Applied update: added `scripts/check_effectiveness_plan.py` from the updated
+  kit and wired it into `python scripts/check_harness.py`.
+- Source tracking: `.harness/source.json` now records `updated_at` and
+  `update_command`.
+- Skipped update candidates: dogfood checklist, validation examples, and kit
+  README changes were kept as reference material because they are starter-kit
+  governance content rather than target ERP behavior.
+- Comparison boundary: this is non-comparable harness maintenance and is not
+  evidence of agent-effectiveness improvement.
 
 ## Assumptions
 

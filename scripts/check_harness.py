@@ -33,6 +33,7 @@ def main() -> int:
     run(maven_command())
     run([sys.executable, "scripts/check_docs_drift.py"])
     run([sys.executable, "scripts/check_structure.py"])
+    run([sys.executable, "scripts/check_effectiveness_plan.py"])
     return 0
 
 

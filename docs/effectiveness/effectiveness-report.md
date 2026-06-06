@@ -12,7 +12,7 @@
 
 - Kit path: `/Users/wb/Desktop/harness-starter-kit`
 - Kit remote: `https://github.com/baskduf/harness-starter-kit.git`
-- Kit commit: `f06600e2baaadcc0930573409c850c11a3168ace`
+- Kit commit: `387dbfabda3d63975494bdabfc812ddf64100919`
 - Applied profile: `spring`
 - Source tracking: `.harness/source.json`
 
@@ -49,12 +49,14 @@ point.
 | Run | Reason excluded | Use in metrics |
 | --- | --- | --- |
 | setup-2026-06-06 | Initial ERP MVP, harness adoption, source tracking, and setup verification | Excluded from comparable product-task count |
+| harness-update-2026-06-06 | Refreshed harness-starter-kit source tracking and added effectiveness evidence consistency check | Excluded from comparable product-task count |
 
 ## Run Log
 
 | Condition | Task ID | Run | Verification result | Notes |
 | --- | --- | ---: | --- | --- |
 | harnessed-only | setup | 1 | pass after non-comparable setup fix | Spring Boot coordinate corrected from generated `4.0.6.RELEASE` to resolvable `4.0.6`; setup is excluded from comparable product-task count |
+| harnessed-only | harness-update | 1 | pass | Added `scripts/check_effectiveness_plan.py` to the local harness gate; source tracking updated to kit commit `387dbfabda3d63975494bdabfc812ddf64100919`; excluded from comparable product-task count |
 | harnessed-only | ERP-001 | 1 | first pass and final pass | Added employee search by case-insensitive substring; no known boundary drift |
 | harnessed-only | ERP-002 | 1 | first pass and final pass | Added service-layer positive amount validation; no known boundary drift |
 | harnessed-only | ERP-003 | 1 | first pass and final pass | Added persisted approval/rejection comments with blank-to-null normalization; no known boundary drift |
