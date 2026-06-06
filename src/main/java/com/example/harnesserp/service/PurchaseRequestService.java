@@ -2,6 +2,7 @@ package com.example.harnesserp.service;
 
 import com.example.harnesserp.domain.Employee;
 import com.example.harnesserp.domain.PurchaseRequest;
+import com.example.harnesserp.domain.PurchaseRequestStatus;
 import com.example.harnesserp.dto.CreatePurchaseRequestRequest;
 import com.example.harnesserp.dto.PurchaseRequestResponse;
 import com.example.harnesserp.policy.AccessPolicy;
@@ -51,7 +52,12 @@ public class PurchaseRequestService {
 
     @Transactional(readOnly = true)
     public List<PurchaseRequestResponse> list() {
-        return purchaseRequestRepository.findAll().stream()
+        return list(null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PurchaseRequestResponse> list(Long employeeId, PurchaseRequestStatus status) {
+        return findForFilters(employeeId, status).stream()
                 .map(PurchaseRequestResponse::from)
                 .toList();
     }
@@ -75,5 +81,18 @@ public class PurchaseRequestService {
         if (!accessPolicy.canCreatePurchaseRequest(callerRole)) {
             throw new BusinessRuleException("EMPLOYEE role is required to create purchase requests");
         }
+    }
+
+    private List<PurchaseRequest> findForFilters(Long employeeId, PurchaseRequestStatus status) {
+        if (employeeId != null && status != null) {
+            return purchaseRequestRepository.findByEmployeeIdAndStatus(employeeId, status);
+        }
+        if (employeeId != null) {
+            return purchaseRequestRepository.findByEmployeeId(employeeId);
+        }
+        if (status != null) {
+            return purchaseRequestRepository.findByStatus(status);
+        }
+        return purchaseRequestRepository.findAll();
     }
 }
