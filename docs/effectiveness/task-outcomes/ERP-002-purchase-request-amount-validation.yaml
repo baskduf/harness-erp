@@ -13,7 +13,7 @@ task:
   run_id: ERP-002-2026-06-06
   prompt_summary: Add purchase request amount validation requiring positive amounts, enforced in the service layer even when controller validation is bypassed.
   prompt_ref: /Users/wb/Desktop/prompt/02-erp-002-purchase-request-amount-validation.md
-  prompt_hash: unknown
+  prompt_hash: sha256:3778bf1a2a80e2dc24339059093d619a69bad2b9d96518f16f5b6661f76e8cf4
   comparable_task_group: harness-erp-initial-benchmark
   condition: harnessed-only
   start_ref: 9f7ff31bda4c0581eaf6c25a0697240f22b0617f

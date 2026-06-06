@@ -104,10 +104,10 @@ point.
 - What improved: unknown; no improvement claim is supported by this initial
   harnessed-only benchmark.
 - What did not improve: unknown.
-- Confounders or limitations: no baseline and no completed product-task records
-  yet.
-- Harness changes to make next: record ERP-001 through ERP-005 task outcomes as
-  they run.
+- Confounders or limitations: no baseline exists, all five planned product-task
+  records are complete, and this remains a harnessed-only initial benchmark.
+- Harness changes to make next: review the completed task outcomes with a human
+  reviewer if human rework minutes or qualitative review findings are needed.
 - Human rework interpretation: `unknown` is distinct from `0`; use `unknown`
   unless a human reviewer provides a value.
 

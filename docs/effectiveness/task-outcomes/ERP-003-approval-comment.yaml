@@ -13,7 +13,7 @@ task:
   run_id: ERP-003-2026-06-06
   prompt_summary: Add optional approval and rejection comments, persist nonblank comments, normalize blank comments to null, and expose comments in approval responses.
   prompt_ref: /Users/wb/Desktop/prompt/03-erp-003-approval-comment.md
-  prompt_hash: unknown
+  prompt_hash: sha256:f01a1e8a9352e3b6498306d9dde661fad6941a2f678d66b1c83e921c0bc60e4b
   comparable_task_group: harness-erp-initial-benchmark
   condition: harnessed-only
   start_ref: d1e5d51916e428fe43fb9cd49145bcfb901c4905

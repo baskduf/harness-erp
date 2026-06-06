@@ -14,6 +14,25 @@
 - CI or verification path: local harness gate only
 - Monorepo or special layout: no
 
+## Files Added Or Changed
+
+- `AGENTS.md`: project purpose, commands, source boundaries, generated-file
+  rules, local config rules, completion checks, and security-policy caveat.
+- `.harness/source.json`: harness-starter-kit source tracking.
+- `docs/`: harness adoption report, Harness Doctor setup baseline, coding
+  conventions, domain glossary, decision records, failure memory, effectiveness
+  report, and task outcome records.
+- `scripts/`: `check_harness.py`, `check_docs_drift.py`, and
+  `check_structure.py`.
+- `src/`: minimal Spring Boot ERP MVP and staged ERP-001 through ERP-005
+  product-task implementations.
+
+## Existing Structures Reused
+
+- The generated Maven wrapper, Spring Boot source layout, and Spring Boot test
+  conventions were reused instead of adding a second build path.
+- No pre-existing repository docs or CI existed before setup.
+
 ## Checks Run
 
 ```bash
@@ -106,6 +125,44 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
     for product-task measurement.
   - Harness Doctor does not prove agent effectiveness.
 
+## Server Or Fixture Verification
+
+- Required: no for the benchmark completion gate, because service tests and the
+  Spring Boot context test cover the MVP behavior without running a long-lived
+  server.
+- How to run: `./mvnw spring-boot:run` from `/Users/wb/Desktop/harness-erp` if
+  interactive API testing is needed.
+- Verification performed: automated context and service tests through
+  `python scripts/check_harness.py`.
+- Not applicable: no external seed data, emulator, hardware, or persistent
+  fixture dependency is required.
+
+## External API Verification
+
+- Required: no; the MVP uses H2 and no external provider API.
+- Boundary: not applicable.
+- Provider boundary fixture: not applicable.
+- Endpoint parameter contract: not applicable.
+- Live/mock mode: not applicable.
+- Secret handling and redaction checked: no external secrets are used; local
+  config and `.env` files are ignored.
+- Empty or zero-result behavior: covered where relevant by service tests.
+- Provider error handling: not applicable.
+- Focused smoke command or fixture: `python scripts/check_harness.py` is enough
+  for this local-only benchmark.
+
+## Feature Scenario Test Note
+
+- Broad feature work: yes; setup plus ERP-001 through ERP-005 changed the MVP
+  behavior across employees, purchase requests, approvals, and policy docs.
+- Build-only validation is enough: no; service tests and policy tests are part
+  of the normal gate.
+- Scenarios covered for broad feature work: employee create/list/search/detail,
+  purchase request creation/status defaults/amount validation, approval and
+  rejection transitions/comments, department persistence, and role-policy
+  allow/deny combinations.
+- Manual or hardware-dependent checks: none.
+
 ## Generated-File And Local-Config Rules Added
 
 - Generated build outputs are ignored: `target/`, `build/`, `out/`, `.gradle/`,
@@ -118,7 +175,7 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 
 - Evaluation mode: `harnessed-only-initial-benchmark`
 - Baseline available: no
-- Comparable product-task benchmark runs:
+- Comparable tasks to repeat or track:
   - ERP-001: Add employee search by name.
   - ERP-002: Add purchase request amount validation.
   - ERP-003: Add approval comment.
@@ -127,9 +184,21 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 - Primary metric: wrong-file edits, repeated known mistakes, first-pass
   verification result, drift violations, reverted files, and human rework when
   a human reviewer supplies it.
+- Review window: after each measurable ERP task and again after ERP-005
+  aggregate evidence is complete.
 - Human rework minutes: `unknown` unless a human reviewer provides a value.
 - Results location: `docs/effectiveness/effectiveness-report.md`
 - Task outcome records location: `docs/effectiveness/task-outcomes/`
+
+## Failure Memory
+
+- Recorded: `docs/failures/0001-spring-boot-coordinate-resolution.md`
+- Detection or prevention check: `python scripts/check_harness.py` and
+  `./mvnw test` detect unresolved Spring Boot Maven coordinates before a stage
+  is considered complete.
+- Skipped: no other setup or ERP-stage failure memory records were added; the
+  other task checks passed first verification and were covered by task outcome
+  records.
 
 ## Documentation Updated
 
@@ -140,7 +209,30 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 - `docs/decisions/0001-initial-spring-boot-erp-architecture.md`: setup
   architecture decision.
 - `docs/failures/README.md`: when to record failure memory.
+- `docs/failures/0001-spring-boot-coordinate-resolution.md`: Spring Boot
+  coordinate resolution failure and prevention check.
 - `docs/effectiveness/effectiveness-report.md`: setup and future benchmark plan.
+- Behavior or integration decisions considered: Spring Boot architecture, H2
+  persistence, purchase request status transitions, approval comment
+  normalization, employee department modeling, and role-policy deferral of
+  runtime HTTP security.
+- Decision memory result: ADRs added for initial Spring Boot architecture and
+  role-based access policy; failure memory added for Maven coordinate
+  resolution.
+- Not updated: README was not created because the harness evidence and
+  `AGENTS.md` contain the required stage instructions for this benchmark.
+
+## Drift Checks Added
+
+- Baseline doc or structure hygiene checks: `scripts/check_docs_drift.py` and
+  `scripts/check_structure.py`.
+- Encoding or localization hygiene checks: ASCII-only convention documented;
+  no separate encoding checker was needed for this Java MVP.
+- Target-specific architecture checks: `scripts/check_structure.py` checks
+  required package directories, ignored generated files, and controller/repository
+  boundary.
+- Not added: CI drift checks were deferred because the benchmark required local
+  verification only.
 
 ## Assumptions
 

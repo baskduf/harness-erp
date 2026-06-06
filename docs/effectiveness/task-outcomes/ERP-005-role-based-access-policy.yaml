@@ -13,7 +13,7 @@ task:
   run_id: ERP-005-2026-06-06
   prompt_summary: Add a documented role-based access policy with a minimal code-level role type, policy service, and focused tests; intentionally defer full Spring Security.
   prompt_ref: /Users/wb/Desktop/prompt/05-erp-005-role-based-access-policy.md
-  prompt_hash: unknown
+  prompt_hash: sha256:239d5d9a73b3ecb5f1547507a90f79c08ded945935d22c5d2381209a9557f98d
   comparable_task_group: harness-erp-initial-benchmark
   condition: harnessed-only
   start_ref: 5a2b849129aabeefdd8c9de4bc4a1534b1050882

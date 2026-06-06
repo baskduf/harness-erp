@@ -13,7 +13,7 @@ task:
   run_id: ERP-001-2026-06-06
   prompt_summary: Add employee search by name with case-insensitive substring matching and service-layer rejection of empty or blank terms.
   prompt_ref: /Users/wb/Desktop/prompt/01-erp-001-employee-search.md
-  prompt_hash: unknown
+  prompt_hash: sha256:0ed7c99fc332c0581feecd1142c159147f14f91f05ae82a800a44a0f5bbfccdd
   comparable_task_group: harness-erp-initial-benchmark
   condition: harnessed-only
   start_ref: a1521406f443d3a5a9d2c86bb987658068afafd8

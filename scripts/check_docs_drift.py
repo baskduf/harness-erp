@@ -74,8 +74,8 @@ def main() -> int:
         "kit_url:",
         "kit_commit:",
         "source_tracking_ref: .harness/source.json",
-        "include_in_effectiveness_report: true",
-        "include_in_comparable_product_task_count: true",
+        "include_in_effectiveness_report:",
+        "include_in_comparable_product_task_count:",
     ]
     for expected_text in required_template_text:
         if expected_text not in template:

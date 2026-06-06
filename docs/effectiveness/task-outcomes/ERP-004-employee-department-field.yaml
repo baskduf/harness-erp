@@ -13,7 +13,7 @@ task:
   run_id: ERP-004-2026-06-06
   prompt_summary: Add required nonblank department to employee creation and include department in list, detail, and search responses without introducing a Department aggregate.
   prompt_ref: /Users/wb/Desktop/prompt/04-erp-004-employee-department-field.md
-  prompt_hash: unknown
+  prompt_hash: sha256:abc593878228e7b6c3a1c89c50342b2cf2cddba2a941d37c5b62a98c6bd332e2
   comparable_task_group: harness-erp-initial-benchmark
   condition: harnessed-only
   start_ref: 638d6d6bc69204bea61a4515004413eb58b9f30d

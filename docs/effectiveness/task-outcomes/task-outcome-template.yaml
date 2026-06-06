@@ -58,5 +58,5 @@ outcome:
 follow_up:
   harness_change_needed: unknown
   decision_or_failure_record: unknown
-  include_in_effectiveness_report: true
-  include_in_comparable_product_task_count: true
+  include_in_effectiveness_report: false
+  include_in_comparable_product_task_count: false
