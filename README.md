@@ -89,6 +89,10 @@ The Purchase Requests tab can list, filter, and create purchase requests. Use
 role `EMPLOYEE` for purchase request creation; non-employee role policy denials
 are shown in the status bar.
 
+The Approval Queue tab lists submitted purchase requests and supports approve
+or reject actions with optional comments. Use role `MANAGER` for approval
+actions; approval history is loaded from the persisted history endpoint.
+
 ## Notes For Contributors
 
 - Application code lives under `src/main/java/com/example/harnesserp`.

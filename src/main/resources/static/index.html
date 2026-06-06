@@ -187,27 +187,31 @@
         <div class="erp-panel">
           <div class="erp-panel-title">Search Criteria</div>
           <div class="erp-form-grid">
-            <label>Status <select disabled><option>SUBMITTED</option></select></label>
-            <label>Minimum Amount <input class="erp-number-field" type="text" readonly></label>
-            <label>Employee ID <input class="erp-code-field" type="text" readonly></label>
-            <button type="button" data-command="search">Search</button>
-            <button type="button" data-command="reset">Reset</button>
+            <label>Status
+              <select id="approvalQueueStatus" class="erp-code-field">
+                <option value="SUBMITTED">SUBMITTED</option>
+              </select>
+            </label>
+            <label>Request ID <input id="approvalQueueRequestId" class="erp-code-field" type="text" value="auto" readonly></label>
+            <label>Employee ID <input id="approvalQueueEmployeeId" class="erp-code-field" type="text" value="all" readonly></label>
+            <button type="button" id="approvalQueueSearchButton" data-approval-action="queue-search">Search</button>
+            <button type="button" id="approvalQueueResetButton" data-approval-action="queue-reset">Reset</button>
           </div>
         </div>
         <div class="erp-panel erp-grid-panel">
-          <div class="erp-panel-title">Queue</div>
+          <div class="erp-panel-title">Queue <span id="approvalQueueRecordCount" class="erp-record-count">0 records</span></div>
           <table class="erp-grid" aria-label="Approval queue">
             <thead>
               <tr>
                 <th>Select</th>
                 <th>Request ID</th>
                 <th>Employee ID</th>
+                <th>Description</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="approvalQueueRows">
               <tr data-row-key="approval-empty">
                 <td class="erp-center">-</td>
                 <td class="erp-code">unknown</td>
@@ -219,9 +223,16 @@
         <div class="erp-panel">
           <div class="erp-panel-title">Decision</div>
           <div class="erp-form-grid erp-detail-grid">
-            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
-            <label>Decision <select disabled><option>unknown</option></select></label>
-            <label>Comment <input type="text" readonly></label>
+            <label>Request ID <input id="approvalRequestId" class="erp-code-field" type="text" value="none" readonly></label>
+            <label>Employee ID <input id="approvalEmployeeId" class="erp-code-field" type="text" value="unknown" readonly></label>
+            <label>Amount <input id="approvalAmount" class="erp-number-field" type="text" value="unknown" readonly></label>
+            <label>Status <input id="approvalStatus" class="erp-code-field" type="text" value="unknown" readonly></label>
+            <label>Comment <input id="approvalComment" type="text" autocomplete="off"></label>
+          </div>
+          <div class="erp-form-actions">
+            <button type="button" id="approvalApproveButton" data-approval-action="approve">Approve</button>
+            <button type="button" id="approvalRejectButton" data-approval-action="reject">Reject</button>
+            <button type="button" id="approvalReloadButton" data-approval-action="reload">Reload Detail</button>
           </div>
         </div>
       </section>
@@ -231,14 +242,14 @@
         <div class="erp-panel">
           <div class="erp-panel-title">Search Criteria</div>
           <div class="erp-form-grid">
-            <label>Request ID <input class="erp-code-field" type="text" readonly></label>
-            <label>Decision <select disabled><option>All</option></select></label>
-            <button type="button" data-command="search">Search</button>
-            <button type="button" data-command="reset">Reset</button>
+            <label>Request ID <input id="historyPurchaseRequestId" class="erp-code-field erp-required-field" type="number" min="1"></label>
+            <label>Decision <input id="historyDecisionFilter" class="erp-code-field" type="text" value="all" readonly></label>
+            <button type="button" id="historySearchButton" data-history-action="search">Search</button>
+            <button type="button" id="historyResetButton" data-history-action="reset">Reset</button>
           </div>
         </div>
         <div class="erp-panel erp-grid-panel">
-          <div class="erp-panel-title">History</div>
+          <div class="erp-panel-title">History <span id="historyRecordCount" class="erp-record-count">0 records</span></div>
           <table class="erp-grid" aria-label="Approval history">
             <thead>
               <tr>
@@ -250,7 +261,7 @@
                 <th>Created</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="historyRows">
               <tr data-row-key="history-empty">
                 <td class="erp-center">-</td>
                 <td class="erp-code">unknown</td>

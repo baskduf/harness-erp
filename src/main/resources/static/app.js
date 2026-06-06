@@ -45,6 +45,16 @@
         status: ""
       },
       employeeLookup: []
+    },
+    approvalQueue: {
+      rows: [],
+      selectedId: null,
+      selectedRequest: null,
+      lastStatus: "SUBMITTED"
+    },
+    approvalHistory: {
+      rows: [],
+      lastPurchaseRequestId: ""
     }
   };
 
@@ -184,6 +194,17 @@
       return "unknown";
     }
     return date.toISOString().slice(0, 10);
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return "unknown";
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "unknown";
+    }
+    return date.toISOString().replace("T", " ").slice(0, 19);
   }
 
   function formatStatus(value) {
@@ -719,6 +740,295 @@
     }
   }
 
+  function approvalQueueElements() {
+    return {
+      rows: document.getElementById("approvalQueueRows"),
+      recordCount: document.getElementById("approvalQueueRecordCount"),
+      status: document.getElementById("approvalQueueStatus"),
+      detailRequestId: document.getElementById("approvalRequestId"),
+      detailEmployeeId: document.getElementById("approvalEmployeeId"),
+      detailAmount: document.getElementById("approvalAmount"),
+      detailStatus: document.getElementById("approvalStatus"),
+      comment: document.getElementById("approvalComment")
+    };
+  }
+
+  function approvalHistoryElements() {
+    return {
+      purchaseRequestId: document.getElementById("historyPurchaseRequestId"),
+      rows: document.getElementById("historyRows"),
+      recordCount: document.getElementById("historyRecordCount")
+    };
+  }
+
+  function renderApprovalQueuePlaceholder(message) {
+    const elements = approvalQueueElements();
+    if (!elements.rows) {
+      return;
+    }
+    const row = document.createElement("tr");
+    appendCell(row, "-", "erp-center");
+    appendCell(row, "unknown", "erp-code");
+    appendCell(row, message, null, 4);
+    elements.rows.replaceChildren(row);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = "0 records";
+    }
+  }
+
+  function renderApprovalQueueRows(purchaseRequests) {
+    const elements = approvalQueueElements();
+    if (!elements.rows) {
+      return;
+    }
+    if (!purchaseRequests.length) {
+      renderApprovalQueuePlaceholder("No submitted requests found.");
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    purchaseRequests.forEach(function (purchaseRequest) {
+      const row = document.createElement("tr");
+      const rowKey = "approval-" + purchaseRequest.id;
+      row.dataset.rowKey = rowKey;
+      row.dataset.approvalRequestId = String(purchaseRequest.id);
+      if (state.approvalQueue.selectedId === purchaseRequest.id) {
+        row.classList.add("is-selected");
+      }
+      appendCell(row, ">", "erp-center");
+      appendCell(row, formatId("PR", purchaseRequest.id), "erp-code");
+      appendCell(row, formatId("EMP", purchaseRequest.employeeId), "erp-code");
+      appendCell(row, purchaseRequest.description || "unknown");
+      appendCell(row, formatAmount(purchaseRequest.amount), "erp-amount");
+      appendCell(row, formatStatus(purchaseRequest.status), "erp-code");
+      row.addEventListener("click", function () {
+        loadApprovalQueueDetail(purchaseRequest.id);
+      });
+      fragment.appendChild(row);
+    });
+    elements.rows.replaceChildren(fragment);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = purchaseRequests.length
+        + (purchaseRequests.length === 1 ? " record" : " records");
+    }
+  }
+
+  function setApprovalQueueDetail(purchaseRequest) {
+    const elements = approvalQueueElements();
+    state.approvalQueue.selectedId = purchaseRequest ? purchaseRequest.id : null;
+    state.approvalQueue.selectedRequest = purchaseRequest || null;
+    if (elements.detailRequestId) {
+      elements.detailRequestId.value = purchaseRequest ? formatId("PR", purchaseRequest.id) : "none";
+    }
+    if (elements.detailEmployeeId) {
+      elements.detailEmployeeId.value = purchaseRequest ? formatId("EMP", purchaseRequest.employeeId) : "unknown";
+    }
+    if (elements.detailAmount) {
+      elements.detailAmount.value = purchaseRequest ? formatAmount(purchaseRequest.amount) : "unknown";
+    }
+    if (elements.detailStatus) {
+      elements.detailStatus.value = purchaseRequest ? formatStatus(purchaseRequest.status) : "unknown";
+    }
+    if (elements.comment && !purchaseRequest) {
+      elements.comment.value = "";
+    }
+    document.querySelectorAll("#approvalQueueRows [data-row-key]").forEach(function (row) {
+      row.classList.toggle(
+        "is-selected",
+        purchaseRequest && row.dataset.approvalRequestId === String(purchaseRequest.id)
+      );
+    });
+  }
+
+  async function loadApprovalQueue(options) {
+    const requestOptions = options || {};
+    const elements = approvalQueueElements();
+    const status = elements.status && elements.status.value ? elements.status.value : "SUBMITTED";
+    state.approvalQueue.lastStatus = status;
+    const purchaseRequests = await apiRequest("/purchase-requests", {
+      query: { status: status }
+    });
+    state.approvalQueue.rows = Array.isArray(purchaseRequests) ? purchaseRequests : [];
+    renderApprovalQueueRows(state.approvalQueue.rows);
+    if (!state.approvalQueue.rows.some(function (request) {
+      return request.id === state.approvalQueue.selectedId;
+    })) {
+      setApprovalQueueDetail(null);
+    }
+    if (!requestOptions.silent) {
+      setStatus("Approval queue loaded. " + state.approvalQueue.rows.length + " submitted records found.", "success");
+    }
+    return state.approvalQueue.rows;
+  }
+
+  async function loadApprovalQueueDetail(purchaseRequestId, options) {
+    const detailOptions = options || {};
+    const purchaseRequest = await apiRequest(
+      "/purchase-requests/" + encodeURIComponent(purchaseRequestId)
+    );
+    setApprovalQueueDetail(purchaseRequest);
+    selectRow("approvalQueue", "approval-" + purchaseRequest.id);
+    if (!detailOptions.silent) {
+      setStatus("Approval detail loaded.", "success");
+    }
+    return purchaseRequest;
+  }
+
+  function approvalCommentPayload() {
+    const elements = approvalQueueElements();
+    const comment = elements.comment ? elements.comment.value.trim() : "";
+    return comment ? { comment: comment } : null;
+  }
+
+  async function submitApprovalDecision(decision) {
+    const purchaseRequestId = state.approvalQueue.selectedId;
+    if (!purchaseRequestId) {
+      setStatus("No submitted request is selected.", "error");
+      return;
+    }
+    const options = {
+      method: "POST"
+    };
+    const payload = approvalCommentPayload();
+    if (payload) {
+      options.body = payload;
+    }
+    const action = decision === "APPROVED" ? "approve" : "reject";
+    try {
+      const approval = await apiRequest(
+        "/purchase-requests/" + encodeURIComponent(purchaseRequestId) + "/" + action,
+        options
+      );
+      const historyElements = approvalHistoryElements();
+      if (historyElements.purchaseRequestId) {
+        historyElements.purchaseRequestId.value = String(purchaseRequestId);
+      }
+      state.approvalHistory.lastPurchaseRequestId = String(purchaseRequestId);
+      await loadApprovalHistory({ purchaseRequestId: purchaseRequestId, silent: true });
+      await loadApprovalQueue({ silent: true });
+      setApprovalQueueDetail(null);
+      setStatus(formatStatus(approval.decision) + ".", "success");
+      return approval;
+    } catch (error) {
+      setStatus(messageFromError(error), "error");
+      return null;
+    }
+  }
+
+  function renderApprovalHistoryPlaceholder(message) {
+    const elements = approvalHistoryElements();
+    if (!elements.rows) {
+      return;
+    }
+    const row = document.createElement("tr");
+    appendCell(row, "-", "erp-center");
+    appendCell(row, "unknown", "erp-code");
+    appendCell(row, message, null, 4);
+    elements.rows.replaceChildren(row);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = "0 records";
+    }
+  }
+
+  function renderApprovalHistoryRows(approvals) {
+    const elements = approvalHistoryElements();
+    if (!elements.rows) {
+      return;
+    }
+    if (!approvals.length) {
+      renderApprovalHistoryPlaceholder("No approval history found.");
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    approvals.forEach(function (approval) {
+      const row = document.createElement("tr");
+      row.dataset.rowKey = "history-" + approval.id;
+      row.dataset.approvalId = String(approval.id);
+      appendCell(row, ">", "erp-center");
+      appendCell(row, formatId("APR", approval.id), "erp-code");
+      appendCell(row, formatId("PR", approval.purchaseRequestId), "erp-code");
+      appendCell(row, formatStatus(approval.decision), "erp-code");
+      appendCell(row, approval.comment || "unknown");
+      appendCell(row, formatDateTime(approval.createdAt), "erp-code");
+      fragment.appendChild(row);
+    });
+    elements.rows.replaceChildren(fragment);
+    if (elements.recordCount) {
+      elements.recordCount.textContent = approvals.length + (approvals.length === 1 ? " record" : " records");
+    }
+  }
+
+  function currentHistoryPurchaseRequestId() {
+    const elements = approvalHistoryElements();
+    return elements.purchaseRequestId ? elements.purchaseRequestId.value.trim() : "";
+  }
+
+  async function loadApprovalHistory(options) {
+    const historyOptions = options || {};
+    const purchaseRequestId = historyOptions.purchaseRequestId !== undefined
+      ? String(historyOptions.purchaseRequestId).trim()
+      : currentHistoryPurchaseRequestId();
+    if (!purchaseRequestId) {
+      renderApprovalHistoryPlaceholder("Enter a purchase request id.");
+      if (!historyOptions.silent) {
+        setStatus("Required value is missing. [Request ID]", "error");
+      }
+      return [];
+    }
+    state.approvalHistory.lastPurchaseRequestId = purchaseRequestId;
+    const approvals = await apiRequest(
+      "/purchase-requests/" + encodeURIComponent(purchaseRequestId) + "/approvals"
+    );
+    state.approvalHistory.rows = Array.isArray(approvals) ? approvals : [];
+    renderApprovalHistoryRows(state.approvalHistory.rows);
+    if (!historyOptions.silent) {
+      setStatus("Approval history loaded. " + state.approvalHistory.rows.length + " records found.", "success");
+    }
+    return state.approvalHistory.rows;
+  }
+
+  function resetApprovalHistory() {
+    const elements = approvalHistoryElements();
+    if (elements.purchaseRequestId) {
+      elements.purchaseRequestId.value = "";
+    }
+    state.approvalHistory.lastPurchaseRequestId = "";
+    renderApprovalHistoryPlaceholder("Enter a purchase request id.");
+    setStatus("Criteria reset.", "success");
+  }
+
+  async function handleApprovalAction(action) {
+    if (action === "queue-search") {
+      await loadApprovalQueue();
+    } else if (action === "queue-reset") {
+      const elements = approvalQueueElements();
+      if (elements.status) {
+        elements.status.value = "SUBMITTED";
+      }
+      setApprovalQueueDetail(null);
+      await loadApprovalQueue();
+    } else if (action === "approve") {
+      await submitApprovalDecision("APPROVED");
+    } else if (action === "reject") {
+      await submitApprovalDecision("REJECTED");
+    } else if (action === "reload") {
+      if (!state.approvalQueue.selectedId) {
+        setStatus("No submitted request is selected.", "error");
+        return;
+      }
+      await loadApprovalQueueDetail(state.approvalQueue.selectedId);
+    }
+  }
+
+  async function handleHistoryAction(action) {
+    if (action === "search") {
+      await loadApprovalHistory();
+    } else if (action === "reset") {
+      resetApprovalHistory();
+    }
+  }
+
   function showView(viewName) {
     state.activeView = viewName;
     document.querySelectorAll("[data-view]").forEach(function (tab) {
@@ -736,6 +1046,23 @@
       loadPurchaseRequests({ filters: state.purchaseRequests.lastFilters, silent: true }).catch(function (error) {
         setStatus(messageFromError(error), "error");
       });
+    }
+    if (viewName === "approvalQueue") {
+      loadApprovalQueue({ silent: true }).catch(function (error) {
+        setStatus(messageFromError(error), "error");
+      });
+    }
+    if (viewName === "approvalHistory") {
+      const elements = approvalHistoryElements();
+      if (elements.purchaseRequestId && state.approvalHistory.lastPurchaseRequestId) {
+        elements.purchaseRequestId.value = state.approvalHistory.lastPurchaseRequestId;
+        loadApprovalHistory({ purchaseRequestId: state.approvalHistory.lastPurchaseRequestId, silent: true })
+          .catch(function (error) {
+            setStatus(messageFromError(error), "error");
+          });
+      } else {
+        renderApprovalHistoryPlaceholder("Enter a purchase request id.");
+      }
     }
     setStatus("Workspace ready.", "success");
   }
@@ -770,6 +1097,34 @@
       }
       if (command === "save") {
         await handlePurchaseAction("create");
+        return;
+      }
+      if (command === "close") {
+        setStatus("Workspace ready.", "success");
+        return;
+      }
+    }
+    if (state.activeView === "approvalQueue") {
+      if (command === "search") {
+        await handleApprovalAction("queue-search");
+        return;
+      }
+      if (command === "approve") {
+        await handleApprovalAction("approve");
+        return;
+      }
+      if (command === "reject") {
+        await handleApprovalAction("reject");
+        return;
+      }
+      if (command === "close") {
+        setStatus("Workspace ready.", "success");
+        return;
+      }
+    }
+    if (state.activeView === "approvalHistory") {
+      if (command === "search") {
+        await handleHistoryAction("search");
         return;
       }
       if (command === "close") {
@@ -850,6 +1205,26 @@
     });
   }
 
+  function bindApprovalQueueScreen() {
+    document.querySelectorAll("[data-approval-action]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        handleApprovalAction(button.dataset.approvalAction).catch(function (error) {
+          setStatus(messageFromError(error), "error");
+        });
+      });
+    });
+  }
+
+  function bindApprovalHistoryScreen() {
+    document.querySelectorAll("[data-history-action]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        handleHistoryAction(button.dataset.historyAction).catch(function (error) {
+          setStatus(messageFromError(error), "error");
+        });
+      });
+    });
+  }
+
   function bindRoleSelector() {
     const selector = document.getElementById("roleSelector");
     if (!selector) {
@@ -878,6 +1253,8 @@
     bindToolbar();
     bindEmployeeScreen();
     bindPurchaseScreen();
+    bindApprovalQueueScreen();
+    bindApprovalHistoryScreen();
     bindRoleSelector();
     bindSelectableRows();
     showView(state.activeView);
@@ -898,6 +1275,7 @@
       id: formatId,
       amount: formatAmount,
       date: formatDate,
+      dateTime: formatDateTime,
       status: formatStatus
     }
   };
