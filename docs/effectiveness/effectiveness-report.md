@@ -41,12 +41,13 @@ ERP-001 through ERP-005 initial benchmark aggregate.
 | ERP-007 | Add purchase request filtering | Purchase request repository, service, controller, DTOs if needed, focused tests, optional glossary, task outcome, effectiveness report | Combined filters ignore one of the filter fields |
 | ERP-008 | Add approval history read behavior | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | Approval history order is nondeterministic |
 | ERP-009 | Add employee update behavior | Employee entity, DTOs, policy code if needed, service, controller, employee tests, optional glossary/decision update, task outcome, effectiveness report | Employee update can bypass ADMIN policy validation |
+| ERP-010 | Add Spring Security request authorization | Security dependencies/config/filter, role-policy decision/docs, HTTP authorization tests, task outcome, effectiveness report | Runtime authorization is claimed but mutating endpoints still reach controllers without a role |
 
 ## Frontend Follow-Up Task Set
 
 FE-001 onward are tracked as a separate frontend follow-up comparable task
 group: `harness-erp-frontend-follow-up`. These records are not merged into the
-ERP-001 through ERP-009 backend benchmark aggregates.
+ERP-001 through ERP-010 backend benchmark aggregates.
 
 | Task ID | Scenario | Expected boundary | Common failure |
 | --- | --- | --- | --- |
@@ -73,19 +74,19 @@ point.
 
 ## Follow-Up Results
 
-Four follow-up comparable product-task runs have been completed in
+Five follow-up comparable product-task runs have been completed in
 `harness-erp-follow-up-benchmark`. This follow-up benchmark is a separate
 harnessed-only observation and does not show effectiveness improvement without a
 comparison point.
 
 | Metric | Baseline | Follow-up harnessed | Delta |
 | --- | --- | --- | --- |
-| Wrong-file edits | unknown | 0 in 4 tasks | unknown |
-| Repeated mistakes | unknown | 0 in 4 tasks | unknown |
-| First-pass verification success | unknown | 4 of 4 tasks | unknown |
-| Drift violations detected | unknown | 0 in 4 tasks | unknown |
+| Wrong-file edits | unknown | 0 in 5 tasks | unknown |
+| Repeated mistakes | unknown | 0 in 5 tasks | unknown |
+| First-pass verification success | unknown | 4 of 5 tasks | unknown |
+| Drift violations detected | unknown | 0 in 5 tasks | unknown |
 | Human rework minutes | unknown | unknown | unknown |
-| Reverted files | unknown | 0 in 4 tasks | unknown |
+| Reverted files | unknown | 0 in 5 tasks | unknown |
 
 ## Frontend Follow-Up Results
 
@@ -128,6 +129,7 @@ without a comparison point.
 | harnessed-only | ERP-007 | 1 | first pass and final pass | Added repository-backed purchase request filters by employee id, status, and both filters together |
 | harnessed-only | ERP-008 | 1 | first pass and final pass | Added persisted approval history ordered by creation time and approval id |
 | harnessed-only | ERP-009 | 1 | first pass and final pass | Added ADMIN-only employee update for name and department |
+| harnessed-only | ERP-010 | 1 | first pass failed, final pass | Added Spring Security request authorization for mutating endpoints; first pass failed on Jackson 3 package mismatch before final fixes |
 | non-comparable-maintenance | MAINT-001 | 1 | first pass and final pass | Added GitHub Actions workflow that runs `python scripts/check_harness.py` with Java 21; not counted as comparable product work |
 | non-comparable-maintenance | MAINT-002 | 1 | first pass and final pass | Added legacy ERP frontend design baseline; not counted as comparable product work |
 | harnessed-only | FE-001 | 1 | first pass failed, final pass | Added the vanilla static legacy ERP shell and shared frontend helpers; frontend follow-up group only |
@@ -151,6 +153,7 @@ without a comparison point.
 | ERP-007 | Purchase request repository, service, controller, DTOs if needed, focused tests, optional glossary, task outcome, effectiveness report | `PurchaseRequestRepository`, `PurchaseRequestService`, `PurchaseRequestController`, `PurchaseRequestServiceTest`, effectiveness report, ERP-007 task outcome | false |
 | ERP-008 | Approval repository, service, controller, DTOs, approval-related tests, optional glossary, task outcome, effectiveness report | `ApprovalRepository`, `ApprovalService`, `ApprovalController`, `ApprovalServiceTest`, effectiveness report, ERP-008 task outcome | false |
 | ERP-009 | Employee entity, DTOs, policy code if needed, service, controller, employee tests, optional glossary/decision update, task outcome, effectiveness report | `Employee`, `UpdateEmployeeRequest`, `AccessPolicy`, `EmployeeService`, `EmployeeController`, employee and policy tests, role policy decision, glossary, effectiveness report, ERP-009 task outcome | false |
+| ERP-010 | Security dependencies/config/filter, docs, HTTP authorization tests, task outcome, effectiveness report | `pom.xml`, security config/filter, HTTP authorization test, README/static UI security copy, AGENTS, glossary, role policy decision, design convention, effectiveness report, ERP-010 task outcome | false |
 | MAINT-002 | README, legacy ERP design convention, effectiveness report, MAINT-002 task outcome | `README.md`, `docs/conventions/legacy-erp-design.md`, effectiveness report, MAINT-002 task outcome | false |
 | FE-001 | Static frontend resources, optional static-resource test, README if needed, effectiveness report, FE-001 task outcome | `README.md`, static `index.html`, `styles.css`, `app.js`, `FrontendShellStaticResourceTest`, effectiveness report, FE-001 task outcome | false |
 | FE-002 | Static frontend resources, optional employee static-resource test, README if needed, effectiveness report, FE-002 task outcome | `README.md`, static `index.html`, `styles.css`, `app.js`, `EmployeeFrontendStaticResourceTest`, effectiveness report, FE-002 task outcome | false |
@@ -171,6 +174,7 @@ without a comparison point.
   - `docs/effectiveness/task-outcomes/ERP-007-purchase-request-filtering.yaml`
   - `docs/effectiveness/task-outcomes/ERP-008-approval-history.yaml`
   - `docs/effectiveness/task-outcomes/ERP-009-employee-update.yaml`
+  - `docs/effectiveness/task-outcomes/ERP-010-spring-security-request-authorization.yaml`
 - Repository refs compared:
   - ERP-001 start ref: `a1521406f443d3a5a9d2c86bb987658068afafd8`
   - ERP-002 start ref: `9f7ff31bda4c0581eaf6c25a0697240f22b0617f`
@@ -181,6 +185,7 @@ without a comparison point.
   - ERP-007 start ref: `3db120556aca37050ceb5793c5a8153e22a2067f`
   - ERP-008 start ref: `27a2c60cc241af9ee1d730e4000348ea8cc45d23`
   - ERP-009 start ref: `25971ff51f9d825571902a8dd5a5c762d3018390`
+  - ERP-010 start ref: `af6d364dd13e5eefb00ab23074e97332f2fc5478`
   - FE-001 start ref: `0b135f836e8e72c67bf755fb3e5fbb8c865c8ef2`
   - FE-002 start ref: `7aefb7ca4b7e96c990edd4f9131c815be46779fa`
   - FE-003 start ref: `38a0c44c96bff0d146de1ce03249fa580b1c35f3`
@@ -198,6 +203,7 @@ without a comparison point.
   - `/Users/wb/Desktop/prompt/07-erp-007-purchase-request-filtering.md`
   - `/Users/wb/Desktop/prompt/08-erp-008-approval-history.md`
   - `/Users/wb/Desktop/prompt/09-erp-009-employee-update.md`
+  - inline conversation request, sha256:`3d00f0d3dd927de3968403da3e2cc0b111d60e721ae5cfc046d1125dc5dc0d84`
   - `/Users/wb/Desktop/prompt/12-fe-001-vanilla-frontend-shell.md`
   - `/Users/wb/Desktop/prompt/13-fe-002-employee-management-frontend.md`
   - `/Users/wb/Desktop/prompt/14-fe-003-purchase-request-frontend.md`
@@ -235,12 +241,15 @@ without a comparison point.
   ERP-004 included fixture-only edits outside the strict expected file boundary.
   ERP-005 intentionally deferred runtime HTTP security and added only a
   documented/tested policy representation.
-- Follow-up benchmark: ERP-006 through ERP-009 passed first verification in the
+- Follow-up benchmark: ERP-006 through ERP-010 are tracked in the
   separate `harness-erp-follow-up-benchmark` task group. ERP-006 enforced
   service-layer policy checks while keeping authenticated HTTP runtime security
-  deferred, ERP-007 added repository-backed purchase request filtering, and
-  ERP-008 added persisted approval history reads. ERP-009 added ADMIN-only
-  employee update behavior for name and department.
+  deferred, ERP-007 added repository-backed purchase request filtering, ERP-008
+  added persisted approval history reads, and ERP-009 added ADMIN-only employee
+  update behavior for name and department. ERP-010 added Spring Security
+  request-level authorization for mutating endpoints using the `X-ERP-Role`
+  role header; its first verification failed on a Jackson 3 package mismatch
+  before the final fix.
 - Frontend follow-up benchmark: FE-001 added the vanilla static ERP shell in
   `harness-erp-frontend-follow-up`. Its first verification failed because the
   initial static-resource test used `TestRestTemplate`, which was unavailable
@@ -262,7 +271,7 @@ without a comparison point.
   verification that every README API is reachable from the vanilla frontend:
   employee create/update/list/search/detail, purchase create/list/filter/detail,
   approval approve/reject, and approval history. Mutating calls continue to use
-  `X-ERP-Role` as a trusted service-layer role input only.
+  `X-ERP-Role` as the role input later protected at request level in ERP-010.
 - Harness maintenance update: MAINT-003 refreshed source tracking to kit commit
   `416409d6ab611e23ba73355d539198025fef5ad5` and adopted the stricter included
   task outcome evidence gate. This is non-comparable maintenance evidence only.
