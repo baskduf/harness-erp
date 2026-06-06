@@ -1,0 +1,72 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: 4c18fb56964c239bdeca39a2776d8713e4757037
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: 2026-06-06
+  agent_or_model: Codex in Codex desktop
+  reviewer: unknown
+
+task:
+  id: MAINT-001
+  run_id: MAINT-001-2026-06-06
+  prompt_summary: Add GitHub Actions CI verification for the local harness gate as non-comparable maintenance work.
+  prompt_ref: /Users/wb/Desktop/prompt/10-maintenance-ci-verification.md
+  prompt_hash: sha256:f546059bde772dbdda602e9785c4e2ed14ec905521022614763d38f855960683
+  comparable_task_group: non-comparable-maintenance
+  condition: non-comparable-maintenance
+  start_ref: 4c18fb56964c239bdeca39a2776d8713e4757037
+  expected_boundary:
+    - .github/workflows/harness-verification.yml
+    - docs/harness/adoption-report.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml
+    - AGENTS.md
+    - docs/failures/
+  known_failure_mode: CI runs only Maven tests but skips harness drift checks; maintenance is accidentally counted as comparable product work; documentation claims CI proves harness effectiveness.
+
+harness_context:
+  harness_doctor_score: unknown
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    kit_commit: 387dbfabda3d63975494bdabfc812ddf64100919
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - docs/conventions/coding.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_structure.py
+    - scripts/check_effectiveness_plan.py
+  relevant_memory_records:
+    - docs/failures/0001-spring-boot-coordinate-resolution.md
+
+outcome:
+  files_changed:
+    - .github/workflows/harness-verification.yml
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml
+    - docs/harness/adoption-report.md
+  wrong_file_edits: false
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+    relevant_output: "Tests run: 47, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS"
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  notes: CI runs the same local harness gate on pull requests and pushes to main with Java 21. This is operational evidence only and is not proof of agent-effectiveness improvement.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: none
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: false

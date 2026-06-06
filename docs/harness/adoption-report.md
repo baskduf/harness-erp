@@ -11,7 +11,8 @@
 - Local server, fixture, seed data, emulator, or device dependencies: no server
   dependency for tests; H2 in-memory database is configured for local/test use
 - Existing docs or agent instructions: none before setup
-- CI or verification path: local harness gate only
+- CI or verification path: local harness gate and GitHub Actions harness
+  verification workflow
 - Monorepo or special layout: no
 
 ## Files Added Or Changed
@@ -24,6 +25,8 @@
   report, and task outcome records.
 - `scripts/`: `check_harness.py`, `check_docs_drift.py`,
   `check_structure.py`, and `check_effectiveness_plan.py`.
+- `.github/workflows/harness-verification.yml`: CI workflow that runs the local
+  harness gate on pull requests and pushes to `main`.
 - `src/`: minimal Spring Boot ERP MVP and staged ERP-001 through ERP-005
   product-task implementations.
 
@@ -97,6 +100,8 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 - Spring profile snippets adopted:
   - Maven wrapper test command as the normal build check.
   - `scripts/check_harness.py` as a local completion gate.
+  - GitHub Actions workflow that runs `python scripts/check_harness.py` with
+    Java 21.
   - Generated build output and local config ignore rules.
 - Spring profile snippets adapted:
   - Harness check script now runs Maven tests plus deterministic docs and
@@ -108,12 +113,13 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
   - Flyway/Liquibase migration guidance, because setup uses Hibernate
     `create-drop` for the H2 MVP.
 - Spring profile snippets deferred:
-  - CI integration.
   - Database migration policy for a persistent database.
 
 ## Verification Gate Placement
 
 - Normal completion gate: `python scripts/check_harness.py`
+- CI gate: `.github/workflows/harness-verification.yml` runs
+  `python scripts/check_harness.py` on pull requests and pushes to `main`.
 - Deterministic behavior checks included in the normal gate:
   - `./mvnw test`
   - `python scripts/check_docs_drift.py`
@@ -124,9 +130,12 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
   - Harness Doctor baseline, which is harness health evidence only.
 - Reasons for focused/manual placement:
   - The normal gate is deterministic and test-focused.
+  - CI runs the same deterministic gate as operational evidence that the local
+    completion check can run outside the developer machine.
   - Manual server smoke checks depend on a running process and are not required
     for product-task measurement.
   - Harness Doctor does not prove agent effectiveness.
+  - CI verification does not prove agent effectiveness improvement.
 
 ## Server Or Fixture Verification
 
@@ -236,8 +245,21 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 - Target-specific architecture checks: `scripts/check_structure.py` checks
   required package directories, ignored generated files, and controller/repository
   boundary.
-- Not added: CI drift checks were deferred because the benchmark required local
-  verification only.
+- CI drift checks: `.github/workflows/harness-verification.yml` runs the same
+  harness gate as the local completion check. This is operational evidence only
+  and is not proof of agent-effectiveness improvement.
+
+## CI Verification Maintenance 2026-06-06
+
+- Run id: `MAINT-001`
+- Workflow: `.github/workflows/harness-verification.yml`
+- Triggers: pull requests and pushes to `main`
+- Runtime: GitHub-hosted Ubuntu runner with Java 21 and Python 3.x
+- Command: `python scripts/check_harness.py`
+- Secrets: none required
+- Evidence interpretation: CI is operational evidence that the harness gate is
+  runnable in automation. It is not a comparable product-task run and does not
+  demonstrate agent-effectiveness improvement.
 
 ## Harness Update 2026-06-06
 
@@ -267,7 +289,7 @@ coordinate to `4.0.6`. Maven test summary: 11 tests run, 0 failures, 0 errors,
 
 ## Remaining Manual Steps
 
-- Decide whether to add CI after the benchmark run.
+- Monitor the GitHub Actions workflow after the next push or pull request.
 - Decide whether to add persistent database migrations after the MVP stops using
   only H2 `create-drop`.
 - Review Harness Doctor output as health evidence only; do not use it as proof

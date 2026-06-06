@@ -79,6 +79,7 @@ comparison point.
 | --- | --- | --- |
 | setup-2026-06-06 | Initial ERP MVP, harness adoption, source tracking, and setup verification | Excluded from comparable product-task count |
 | harness-update-2026-06-06 | Refreshed harness-starter-kit source tracking and added effectiveness evidence consistency check | Excluded from comparable product-task count |
+| MAINT-001-ci-verification | Added GitHub Actions CI for the local harness gate as operational maintenance evidence | Excluded from comparable product-task count |
 
 ## Run Log
 
@@ -95,6 +96,7 @@ comparison point.
 | harnessed-only | ERP-007 | 1 | first pass and final pass | Added repository-backed purchase request filters by employee id, status, and both filters together |
 | harnessed-only | ERP-008 | 1 | first pass and final pass | Added persisted approval history ordered by creation time and approval id |
 | harnessed-only | ERP-009 | 1 | first pass and final pass | Added ADMIN-only employee update for name and department |
+| non-comparable-maintenance | MAINT-001 | 1 | first pass and final pass | Added GitHub Actions workflow that runs `python scripts/check_harness.py` with Java 21; not counted as comparable product work |
 
 ## Changed-Files Consistency
 
@@ -145,6 +147,12 @@ comparison point.
   - `/Users/wb/Desktop/prompt/08-erp-008-approval-history.md`
   - `/Users/wb/Desktop/prompt/09-erp-009-employee-update.md`
 - Verification commands compared: `python scripts/check_harness.py`
+- Non-comparable maintenance outcome records reviewed:
+  - `docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml`
+- Maintenance verification commands:
+  - `python scripts/check_harness.py`
+  - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_effectiveness_plan.py`
+  - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_failure_memory.py`
 
 ## Interpretation
 
@@ -164,6 +172,9 @@ comparison point.
 - Confounders or limitations: no baseline exists, the initial five planned
   product-task records are complete, and follow-up records are tracked
   separately from the initial benchmark aggregate.
+- Non-comparable maintenance: MAINT-001 added CI verification for the local
+  harness gate. This is operational evidence only, does not use secrets, and
+  does not increment comparable product-task counts.
 - Harness changes to make next: review the completed task outcomes with a human
   reviewer if human rework minutes or qualitative review findings are needed.
 - Human rework interpretation: `unknown` is distinct from `0`; use `unknown`
@@ -173,6 +184,8 @@ comparison point.
 
 - Next review window: after each measurable ERP task.
 - Owner or reviewer: unknown.
+- CI follow-up: monitor `.github/workflows/harness-verification.yml` on the
+  next push or pull request.
 - Related decision or failure records:
   - `docs/decisions/0001-initial-spring-boot-erp-architecture.md`
   - `docs/decisions/0002-role-based-access-policy.md`
