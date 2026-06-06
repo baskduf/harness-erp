@@ -1,0 +1,62 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: unknown
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: unknown
+  agent_or_model: Codex in Codex desktop
+  reviewer: unknown
+
+task:
+  id: unknown
+  run_id: unknown
+  prompt_summary: unknown
+  prompt_ref: unknown
+  prompt_hash: unknown
+  comparable_task_group: harness-erp-initial-benchmark
+  condition: harnessed-only
+  start_ref: unknown
+  expected_boundary:
+    - unknown
+  known_failure_mode: unknown
+
+harness_context:
+  harness_doctor_score: unknown
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    kit_commit: f06600e2baaadcc0930573409c850c11a3168ace
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+  relevant_constraints:
+    - scripts/check_harness.py
+  relevant_memory_records:
+    - unknown
+
+outcome:
+  files_changed:
+    - unknown
+  wrong_file_edits: unknown
+  repeated_known_mistake: unknown
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: unknown
+    result: unknown
+    relevant_output: unknown
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: unknown
+    result: unknown
+  drift_violations_detected:
+    - unknown
+  human_rework_minutes: unknown
+  reverted_files: unknown
+  notes: unknown
+
+follow_up:
+  harness_change_needed: unknown
+  decision_or_failure_record: unknown
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: true

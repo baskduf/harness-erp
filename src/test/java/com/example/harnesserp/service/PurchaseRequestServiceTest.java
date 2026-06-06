@@ -1,0 +1,65 @@
+package com.example.harnesserp.service;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.example.harnesserp.domain.PurchaseRequestStatus;
+import com.example.harnesserp.dto.CreateEmployeeRequest;
+import com.example.harnesserp.dto.CreatePurchaseRequestRequest;
+import com.example.harnesserp.dto.EmployeeResponse;
+import com.example.harnesserp.dto.PurchaseRequestResponse;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@Transactional
+class PurchaseRequestServiceTest {
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    @Autowired
+    private PurchaseRequestService purchaseRequestService;
+
+    @Test
+    void createsSubmittedRequestByDefault() {
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.create(new CreatePurchaseRequestRequest(
+                employee().id(),
+                "Keyboard",
+                new BigDecimal("85.00"),
+                null
+        ));
+
+        assertThat(purchaseRequest.status()).isEqualTo(PurchaseRequestStatus.SUBMITTED);
+    }
+
+    @Test
+    void createsDraftRequestWhenExplicitlyRequested() {
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.create(new CreatePurchaseRequestRequest(
+                employee().id(),
+                "Desk",
+                new BigDecimal("500.00"),
+                PurchaseRequestStatus.DRAFT
+        ));
+
+        assertThat(purchaseRequest.status()).isEqualTo(PurchaseRequestStatus.DRAFT);
+    }
+
+    @Test
+    void doesNotAllowApprovedStatusAtCreation() {
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.create(new CreatePurchaseRequestRequest(
+                employee().id(),
+                "Chair",
+                new BigDecimal("250.00"),
+                PurchaseRequestStatus.APPROVED
+        ));
+
+        assertThat(purchaseRequest.status()).isEqualTo(PurchaseRequestStatus.SUBMITTED);
+    }
+
+    private EmployeeResponse employee() {
+        return employeeService.create(new CreateEmployeeRequest("Katherine Johnson"));
+    }
+}

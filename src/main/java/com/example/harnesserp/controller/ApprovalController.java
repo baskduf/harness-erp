@@ -1,0 +1,29 @@
+package com.example.harnesserp.controller;
+
+import com.example.harnesserp.dto.ApprovalResponse;
+import com.example.harnesserp.service.ApprovalService;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/purchase-requests/{purchaseRequestId}")
+public class ApprovalController {
+
+    private final ApprovalService approvalService;
+
+    public ApprovalController(ApprovalService approvalService) {
+        this.approvalService = approvalService;
+    }
+
+    @PostMapping("/approve")
+    public ApprovalResponse approve(@PathVariable Long purchaseRequestId) {
+        return approvalService.approve(purchaseRequestId);
+    }
+
+    @PostMapping("/reject")
+    public ApprovalResponse reject(@PathVariable Long purchaseRequestId) {
+        return approvalService.reject(purchaseRequestId);
+    }
+}
