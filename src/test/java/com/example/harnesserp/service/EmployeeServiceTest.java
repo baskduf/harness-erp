@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.harnesserp.dto.CreateEmployeeRequest;
 import com.example.harnesserp.dto.EmployeeResponse;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +20,13 @@ class EmployeeServiceTest {
 
     @Test
     void createsAndListsEmployees() {
-        EmployeeResponse employee = employeeService.create(new CreateEmployeeRequest("Grace Hopper"));
+        EmployeeResponse employee = employeeService.create(
+                new CreateEmployeeRequest("Grace Hopper", "Engineering")
+        );
 
         assertThat(employee.id()).isNotNull();
         assertThat(employee.name()).isEqualTo("Grace Hopper");
+        assertThat(employee.department()).isEqualTo("Engineering");
         assertThat(employeeService.list())
                 .extracting(EmployeeResponse::name)
                 .contains("Grace Hopper");
@@ -30,17 +34,40 @@ class EmployeeServiceTest {
 
     @Test
     void searchesEmployeesByCaseInsensitiveNameSubstring() {
-        employeeService.create(new CreateEmployeeRequest("Ada Lovelace"));
-        employeeService.create(new CreateEmployeeRequest("Grace Hopper"));
-        employeeService.create(new CreateEmployeeRequest("Katherine Johnson"));
+        employeeService.create(new CreateEmployeeRequest("Ada Lovelace", "Finance"));
+        employeeService.create(new CreateEmployeeRequest("Grace Hopper", "Engineering"));
+        employeeService.create(new CreateEmployeeRequest("Katherine Johnson", "Operations"));
 
-        assertThat(employeeService.searchByName("lov"))
-                .extracting(EmployeeResponse::name)
-                .containsExactly("Ada Lovelace");
+        List<EmployeeResponse> lovelaceResults = employeeService.searchByName("lov");
+        assertThat(lovelaceResults).hasSize(1);
+        assertThat(lovelaceResults.get(0).name()).isEqualTo("Ada Lovelace");
+        assertThat(lovelaceResults.get(0).department()).isEqualTo("Finance");
 
-        assertThat(employeeService.searchByName("HOPPER"))
-                .extracting(EmployeeResponse::name)
-                .containsExactly("Grace Hopper");
+        List<EmployeeResponse> hopperResults = employeeService.searchByName("HOPPER");
+        assertThat(hopperResults).hasSize(1);
+        assertThat(hopperResults.get(0).name()).isEqualTo("Grace Hopper");
+        assertThat(hopperResults.get(0).department()).isEqualTo("Engineering");
+    }
+
+    @Test
+    void getsEmployeeDetailWithDepartment() {
+        EmployeeResponse created = employeeService.create(
+                new CreateEmployeeRequest("Mary Jackson", "Research")
+        );
+
+        EmployeeResponse detail = employeeService.get(created.id());
+
+        assertThat(detail.name()).isEqualTo("Mary Jackson");
+        assertThat(detail.department()).isEqualTo("Research");
+    }
+
+    @Test
+    void rejectsBlankDepartmentForNewEmployee() {
+        assertThatThrownBy(() -> employeeService.create(
+                new CreateEmployeeRequest("Dorothy Vaughan", "   ")
+        ))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("department");
     }
 
     @Test

@@ -1,6 +1,7 @@
 # ERP Domain Glossary
 
 - Employee: a person who can create purchase requests.
+- Department: the required organizational group recorded on an employee.
 - Purchase request: a request from an employee to purchase an item or service.
 - Purchase request amount: the monetary amount requested for a purchase.
 - Draft purchase request: a request that has not been submitted for approval.

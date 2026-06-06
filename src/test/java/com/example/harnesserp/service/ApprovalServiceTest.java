@@ -143,6 +143,6 @@ class ApprovalServiceTest {
     }
 
     private EmployeeResponse employee() {
-        return employeeService.create(new CreateEmployeeRequest("Ada Lovelace"));
+        return employeeService.create(new CreateEmployeeRequest("Ada Lovelace", "Finance"));
     }
 }

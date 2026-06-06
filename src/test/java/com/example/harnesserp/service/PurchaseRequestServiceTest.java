@@ -89,6 +89,6 @@ class PurchaseRequestServiceTest {
     }
 
     private EmployeeResponse employee() {
-        return employeeService.create(new CreateEmployeeRequest("Katherine Johnson"));
+        return employeeService.create(new CreateEmployeeRequest("Katherine Johnson", "Operations"));
     }
 }

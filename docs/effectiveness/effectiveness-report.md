@@ -31,18 +31,18 @@ agent effectiveness.
 
 ## Results
 
-Three comparable product-task runs have been completed. This is an initial
+Four comparable product-task runs have been completed. This is an initial
 harnessed-only observation and does not show improvement without a comparison
 point.
 
 | Metric | Baseline | Harnessed | Delta |
 | --- | --- | --- | --- |
-| Wrong-file edits | unknown | 0 in 3 tasks | unknown |
-| Repeated mistakes | unknown | 0 in 3 tasks | unknown |
-| First-pass verification success | unknown | 3 of 3 tasks | unknown |
-| Drift violations detected | unknown | 0 in 3 tasks | unknown |
+| Wrong-file edits | unknown | 1 in 4 tasks | unknown |
+| Repeated mistakes | unknown | 0 in 4 tasks | unknown |
+| First-pass verification success | unknown | 4 of 4 tasks | unknown |
+| Drift violations detected | unknown | 0 in 4 tasks | unknown |
 | Human rework minutes | unknown | unknown | unknown |
-| Reverted files | unknown | 0 in 3 tasks | unknown |
+| Reverted files | unknown | 0 in 4 tasks | unknown |
 
 ## Non-Comparable Setup Runs
 
@@ -58,6 +58,7 @@ point.
 | harnessed-only | ERP-001 | 1 | first pass and final pass | Added employee search by case-insensitive substring; no known boundary drift |
 | harnessed-only | ERP-002 | 1 | first pass and final pass | Added service-layer positive amount validation; no known boundary drift |
 | harnessed-only | ERP-003 | 1 | first pass and final pass | Added persisted approval/rejection comments with blank-to-null normalization; no known boundary drift |
+| harnessed-only | ERP-004 | 1 | first pass and final pass | Added required employee department field; fixture-only updates in approval/purchase tests were outside the strict expected boundary |
 
 ## Changed-Files Consistency
 
@@ -67,6 +68,7 @@ point.
 | ERP-001 | Employee controller, service, repository, DTOs/tests, task outcome, effectiveness report | `EmployeeController`, `EmployeeRepository`, `EmployeeService`, `EmployeeServiceTest`, effectiveness report, ERP-001 task outcome | false |
 | ERP-002 | Purchase request DTOs, service, controller if needed, entity if needed, tests, task outcome, effectiveness report | `CreatePurchaseRequestRequest`, `PurchaseRequestService`, `PurchaseRequestServiceTest`, effectiveness report, ERP-002 task outcome | false |
 | ERP-003 | Approval DTOs, approval service behavior, approval entity, approval response DTO, approval-related tests, task outcome, effectiveness report | `ApprovalController`, `Approval`, `ApprovalActionRequest`, `ApprovalResponse`, `ApprovalService`, `ApprovalServiceTest`, effectiveness report, ERP-003 task outcome | false |
+| ERP-004 | Employee entity, DTOs, service, controller, repository if needed, employee tests, optional glossary, task outcome, effectiveness report | Employee files, `EmployeeServiceTest`, glossary, effectiveness report, ERP-004 task outcome, plus fixture-only edits in `ApprovalServiceTest` and `PurchaseRequestServiceTest` | true |
 
 ## Source Records
 
@@ -74,10 +76,12 @@ point.
   - `docs/effectiveness/task-outcomes/ERP-001-employee-search.yaml`
   - `docs/effectiveness/task-outcomes/ERP-002-purchase-request-amount-validation.yaml`
   - `docs/effectiveness/task-outcomes/ERP-003-approval-comment.yaml`
+  - `docs/effectiveness/task-outcomes/ERP-004-employee-department-field.yaml`
 - Repository refs compared:
   - ERP-001 start ref: `a1521406f443d3a5a9d2c86bb987658068afafd8`
   - ERP-002 start ref: `9f7ff31bda4c0581eaf6c25a0697240f22b0617f`
   - ERP-003 start ref: `d1e5d51916e428fe43fb9cd49145bcfb901c4905`
+  - ERP-004 start ref: `638d6d6bc69204bea61a4515004413eb58b9f30d`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -89,8 +93,8 @@ point.
 
 ## Interpretation
 
-- Observed benchmark: ERP-001 through ERP-003 passed first verification and
-  stayed within their expected file boundaries.
+- Observed benchmark: ERP-001 through ERP-004 passed first verification.
+  ERP-004 included fixture-only edits outside the strict expected file boundary.
 - What improved: unknown; no improvement claim is supported by this initial
   harnessed-only benchmark.
 - What did not improve: unknown.

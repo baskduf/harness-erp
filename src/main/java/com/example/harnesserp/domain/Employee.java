@@ -16,11 +16,15 @@ public class Employee {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String department;
+
     protected Employee() {
     }
 
-    public Employee(String name) {
+    public Employee(String name, String department) {
         this.name = requireText(name, "name");
+        this.department = requireText(department, "department");
     }
 
     public Long getId() {
@@ -29,6 +33,10 @@ public class Employee {
 
     public String getName() {
         return name;
+    }
+
+    public String getDepartment() {
+        return department;
     }
 
     private static String requireText(String value, String fieldName) {

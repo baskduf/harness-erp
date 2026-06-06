@@ -19,7 +19,7 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponse create(CreateEmployeeRequest request) {
-        Employee employee = new Employee(request.name());
+        Employee employee = new Employee(request.name(), request.department());
         return EmployeeResponse.from(employeeRepository.save(employee));
     }
 
@@ -39,5 +39,14 @@ public class EmployeeService {
         return employeeRepository.findByNameContainingIgnoreCase(name.strip()).stream()
                 .map(EmployeeResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public EmployeeResponse get(Long employeeId) {
+        return employeeRepository.findById(employeeId)
+                .map(EmployeeResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Employee " + employeeId + " was not found"
+                ));
     }
 }

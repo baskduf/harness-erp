@@ -1,0 +1,82 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: 638d6d6bc69204bea61a4515004413eb58b9f30d
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: 2026-06-06
+  agent_or_model: Codex in Codex desktop
+  reviewer: unknown
+
+task:
+  id: ERP-004
+  run_id: ERP-004-2026-06-06
+  prompt_summary: Add required nonblank department to employee creation and include department in list, detail, and search responses without introducing a Department aggregate.
+  prompt_ref: /Users/wb/Desktop/prompt/04-erp-004-employee-department-field.md
+  prompt_hash: unknown
+  comparable_task_group: harness-erp-initial-benchmark
+  condition: harnessed-only
+  start_ref: 638d6d6bc69204bea61a4515004413eb58b9f30d
+  expected_boundary:
+    - src/main/java/com/example/harnesserp/domain/Employee.java
+    - src/main/java/com/example/harnesserp/dto/CreateEmployeeRequest.java
+    - src/main/java/com/example/harnesserp/dto/EmployeeResponse.java
+    - src/main/java/com/example/harnesserp/service/EmployeeService.java
+    - src/main/java/com/example/harnesserp/controller/EmployeeController.java
+    - src/main/java/com/example/harnesserp/repository/EmployeeRepository.java
+    - src/test/java/com/example/harnesserp/service/EmployeeServiceTest.java
+    - docs/domain/glossary.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/ERP-004-employee-department-field.yaml
+  known_failure_mode: Field missing from response; field not persisted; employee search tests not updated; unnecessary Department aggregate introduced.
+
+harness_context:
+  harness_doctor_score: 54
+  harness_source:
+    kit_url: https://github.com/baskduf/harness-starter-kit.git
+    kit_commit: f06600e2baaadcc0930573409c850c11a3168ace
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - docs/conventions/coding.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_structure.py
+  relevant_memory_records:
+    - docs/decisions/0001-initial-spring-boot-erp-architecture.md
+
+outcome:
+  files_changed:
+    - docs/domain/glossary.md
+    - src/main/java/com/example/harnesserp/controller/EmployeeController.java
+    - src/main/java/com/example/harnesserp/domain/Employee.java
+    - src/main/java/com/example/harnesserp/dto/CreateEmployeeRequest.java
+    - src/main/java/com/example/harnesserp/dto/EmployeeResponse.java
+    - src/main/java/com/example/harnesserp/service/EmployeeService.java
+    - src/test/java/com/example/harnesserp/service/ApprovalServiceTest.java
+    - src/test/java/com/example/harnesserp/service/EmployeeServiceTest.java
+    - src/test/java/com/example/harnesserp/service/PurchaseRequestServiceTest.java
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/ERP-004-employee-department-field.yaml
+  wrong_file_edits: true
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+    relevant_output: "Tests run: 21, Failures: 0, Errors: 0, Skipped: 0; BUILD SUCCESS"
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  notes: ApprovalServiceTest and PurchaseRequestServiceTest were updated only to pass required department fixture values into CreateEmployeeRequest; these files are outside the strict expected boundary and are counted as wrong-file edits.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: none
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: true
