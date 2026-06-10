@@ -93,13 +93,36 @@ REJECTED_DETECTION_PROSE_PATTERNS = (
     re.compile(r"\bplanned\s+(?:but|for|later|when|after)\b"),
 )
 
+MAVEN_COMMAND_RE = re.compile(
+    r"(?<![\w./\\-])(?P<runner>(?:\./|\.\\)?mvnw(?:\.cmd)?|mvn)\s+"
+    r"(?P<args>[^`\n,;)\]}]+)",
+    flags=re.IGNORECASE,
+)
+GRADLE_COMMAND_RE = re.compile(
+    r"(?<![\w./\\-])(?P<runner>(?:\./|\.\\)?gradlew(?:\.bat)?|gradle)\s+"
+    r"(?P<args>[^`\n,;)\]}]+)",
+    flags=re.IGNORECASE,
+)
+GO_COMMAND_RE = re.compile(
+    r"(?<![\w./\\-])go\s+(?:build|fmt|generate|list|mod|run|test|vet)\b"
+    r"[^`\n,;)\]}]*",
+    flags=re.IGNORECASE,
+)
+
 CONCRETE_CHECK_PATTERNS = (
     re.compile(r"\b(?:tests?|specs?|fixtures?|scripts?)/[^\s,.;)]+"),
     re.compile(r"`?\.github/workflows/[^\s,.;)`]+`?"),
     re.compile(r"\b(?:npm|pnpm|yarn|bun)\s+run\s+[\w:./-]+"),
-    re.compile(r"\b(?:make|just)\s+[\w:./-]+"),
+    re.compile(
+        r"\bmake(?:\s+[\w.-]+=[^\s,;)`\]}]+)*\s+(?!-)[\w:./-]+"
+        r"(?=$|[\s,.;)`\]}])"
+    ),
+    re.compile(r"\bjust\s+(?!-)[\w:./-]+"),
     re.compile(r"\bpython3?\s+(?:-m\s+[\w.:-]+|scripts?/[^\s,.;)]+)"),
     re.compile(r"\bpytest\s+(?:-[\w-]+|tests?/[^\s,.;)]+|[\w/.-]+)"),
+    MAVEN_COMMAND_RE,
+    GRADLE_COMMAND_RE,
+    GO_COMMAND_RE,
     re.compile(r"\b(?:vitest|jest|ruff|mypy|eslint)\s+[\w/.:@-]+"),
     re.compile(r"\blint rule\s+`?[\w@./]+[-:/][\w@./:-]+`?"),
     re.compile(r"\bci gate\s+`?\.github/workflows/[^\s,.;)`]+`?"),
@@ -116,6 +139,21 @@ PATH_REFERENCE_RE = re.compile(
 PACKAGE_SCRIPT_COMMAND_RE = re.compile(
     r"\b(?P<manager>npm|pnpm|yarn|bun)\s+run\s+(?P<script>[\w:./-]+)"
 )
+MAKE_COMMAND_RE = re.compile(
+    r"\bmake(?:\s+[\w.-]+=[^\s,;)`\]}]+)*\s+(?!-)(?P<target>[\w:./-]+)"
+    r"(?=$|[\s,.;)`\]}])"
+)
+JUST_COMMAND_RE = re.compile(r"\bjust\s+(?!-)(?P<recipe>[\w:./-]+)")
+MAKEFILE_NAMES = ("GNUmakefile", "makefile", "Makefile")
+JUSTFILE_NAMES = ("justfile", "Justfile", ".justfile")
+MAVEN_WRAPPER_NAMES = ("mvnw", "mvnw.cmd")
+GRADLE_BUILD_FILES = (
+    "settings.gradle",
+    "settings.gradle.kts",
+    "build.gradle",
+    "build.gradle.kts",
+)
+GRADLE_WRAPPER_NAMES = ("gradlew", "gradlew.bat")
 
 FAILURE_RECORD_RE = re.compile(
     r"`?(docs/failures/[^\s,;)`]+)`?",
@@ -429,6 +467,30 @@ def normalize_package_script(value: str) -> str:
     return value.rstrip(".,;)]}")
 
 
+def normalize_command_target(value: str) -> str:
+    return value.rstrip(".,;)]}")
+
+
+def normalize_command_reference(value: str) -> str:
+    command = value.strip().strip("`")
+    while command.endswith((";", ",", ")", "]", "}")):
+        command = command[:-1].rstrip()
+    if command.endswith(".") and not command.endswith("..."):
+        command = command[:-1].rstrip()
+    return command
+
+
+def normalized_runner(value: str) -> str:
+    runner = value.strip().lower().replace("\\", "/")
+    if runner.startswith("./"):
+        runner = runner[2:]
+    return runner
+
+
+def root_has_go_project(root: Path) -> bool:
+    return (root / "go.mod").exists()
+
+
 def root_package_scripts(root: Path) -> set[str]:
     package_json = root / "package.json"
     if not package_json.exists():
@@ -441,6 +503,71 @@ def root_package_scripts(root: Path) -> set[str]:
     if not isinstance(package_scripts, dict):
         return set()
     return {str(name) for name in package_scripts}
+
+
+def root_make_targets(root: Path) -> set[str]:
+    targets: set[str] = set()
+    path = next(
+        (root / name for name in MAKEFILE_NAMES if (root / name).exists()),
+        None,
+    )
+    if path is None:
+        return targets
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return targets
+    for raw_line in lines:
+        if not raw_line or raw_line[:1].isspace():
+            continue
+        line = raw_line.split("#", 1)[0].rstrip()
+        if ":" not in line:
+            continue
+        target_part, rule_part = line.split(":", 1)
+        if not target_part.strip() or "=" in target_part:
+            continue
+        if rule_part.lstrip().startswith("="):
+            continue
+        for target in target_part.split():
+            if target and "%" not in target and not target.startswith("."):
+                targets.add(target)
+    return targets
+
+
+def root_just_recipes(root: Path) -> set[str]:
+    recipes: set[str] = set()
+    for name in JUSTFILE_NAMES:
+        path = root / name
+        if not path.exists():
+            continue
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for raw_line in lines:
+            if not raw_line or raw_line[:1].isspace():
+                continue
+            line = raw_line.split("#", 1)[0].rstrip()
+            alias_match = re.match(r"alias\s+(?P<name>[\w.-]+)\s*:=", line)
+            if alias_match is not None:
+                recipes.add(alias_match.group("name"))
+                continue
+            if ":" not in line:
+                continue
+            recipe_part, rule_part = line.split(":", 1)
+            if not recipe_part.strip():
+                continue
+            if rule_part.lstrip().startswith("="):
+                continue
+            recipe_part = recipe_part.strip()
+            while recipe_part.startswith("[") and "]" in recipe_part:
+                recipe_part = recipe_part.split("]", 1)[1].strip()
+            if not recipe_part:
+                continue
+            recipe = recipe_part.split()[0].lstrip("@")
+            if recipe and not recipe.startswith("["):
+                recipes.add(recipe)
+    return recipes
 
 
 def missing_package_script_commands(root: Path, value: str | None) -> list[str]:
@@ -461,6 +588,88 @@ def missing_package_script_commands(root: Path, value: str | None) -> list[str]:
         for manager, script in commands
         if script not in scripts
     ]
+
+
+def missing_make_commands(root: Path, value: str | None) -> list[str]:
+    if value is None:
+        return []
+    commands = sorted(
+        {
+            normalize_command_target(match.group("target"))
+            for match in MAKE_COMMAND_RE.finditer(value)
+        }
+    )
+    if not commands:
+        return []
+
+    targets = root_make_targets(root)
+    return [f"make {target}" for target in commands if target not in targets]
+
+
+def missing_just_commands(root: Path, value: str | None) -> list[str]:
+    if value is None:
+        return []
+    commands = sorted(
+        {
+            normalize_command_target(match.group("recipe"))
+            for match in JUST_COMMAND_RE.finditer(value)
+        }
+    )
+    if not commands:
+        return []
+
+    recipes = root_just_recipes(root)
+    return [f"just {recipe}" for recipe in commands if recipe not in recipes]
+
+
+def missing_maven_commands(root: Path, value: str | None) -> list[str]:
+    if value is None:
+        return []
+
+    findings: list[str] = []
+    has_pom = (root / "pom.xml").exists()
+
+    for match in MAVEN_COMMAND_RE.finditer(value):
+        command = normalize_command_reference(match.group(0))
+        runner = normalized_runner(match.group("runner"))
+        if runner in MAVEN_WRAPPER_NAMES and not (root / runner).exists():
+            findings.append(f"maven wrapper command references missing wrapper: {command}")
+        if not has_pom:
+            findings.append(f"maven command references missing pom.xml: {command}")
+
+    return sorted(set(findings))
+
+
+def missing_gradle_commands(root: Path, value: str | None) -> list[str]:
+    if value is None:
+        return []
+
+    findings: list[str] = []
+    has_build_file = any((root / name).exists() for name in GRADLE_BUILD_FILES)
+
+    for match in GRADLE_COMMAND_RE.finditer(value):
+        command = normalize_command_reference(match.group(0))
+        runner = normalized_runner(match.group("runner"))
+        if runner in GRADLE_WRAPPER_NAMES and not (root / runner).exists():
+            findings.append(f"gradle wrapper command references missing wrapper: {command}")
+        if not has_build_file:
+            findings.append(f"gradle command references missing build file: {command}")
+
+    return sorted(set(findings))
+
+
+def missing_go_commands(root: Path, value: str | None) -> list[str]:
+    if value is None or root_has_go_project(root):
+        return []
+    return sorted(
+        {
+            (
+                "go command references missing go.mod: "
+                f"{normalize_command_reference(match.group(0))}"
+            )
+            for match in GO_COMMAND_RE.finditer(value)
+        }
+    )
 
 
 def says_no_failure_record(value: str | None) -> bool:
@@ -626,6 +835,38 @@ def validate_adoption_report(root: Path, path: Path, text: str) -> list[Finding]
                         ),
                     )
                 )
+            for command in missing_make_commands(root, detection_value):
+                findings.append(
+                    Finding(
+                        path,
+                        (
+                            "failure-memory detection references missing "
+                            f"Makefile target: {command}"
+                        ),
+                    )
+                )
+            for command in missing_just_commands(root, detection_value):
+                findings.append(
+                    Finding(
+                        path,
+                        (
+                            "failure-memory detection references missing "
+                            f"justfile recipe: {command}"
+                        ),
+                    )
+                )
+            for message in missing_maven_commands(root, detection_value):
+                findings.append(
+                    Finding(path, f"failure-memory detection {message}")
+                )
+            for message in missing_gradle_commands(root, detection_value):
+                findings.append(
+                    Finding(path, f"failure-memory detection {message}")
+                )
+            for message in missing_go_commands(root, detection_value):
+                findings.append(
+                    Finding(path, f"failure-memory detection {message}")
+                )
 
     return findings
 
@@ -646,7 +887,7 @@ def validate_effectiveness_report(path: Path, text: str) -> list[Finding]:
     return findings
 
 
-def validate_task_outcome(path: Path, text: str) -> list[Finding]:
+def validate_task_outcome(root: Path, path: Path, text: str) -> list[Finding]:
     report_include_value = yaml_field_value(text, "include_in_effectiveness_report")
     comparable_count_value = yaml_field_value(
         text, "include_in_comparable_product_task_count"
@@ -678,6 +919,28 @@ def validate_task_outcome(path: Path, text: str) -> list[Finding]:
                 ),
             )
         )
+
+    verification_command = yaml_field_value(text, "verification_command")
+    for command in missing_make_commands(root, verification_command):
+        findings.append(
+            Finding(
+                path,
+                f"task outcome verification references missing Makefile target: {command}",
+            )
+        )
+    for command in missing_just_commands(root, verification_command):
+        findings.append(
+            Finding(
+                path,
+                f"task outcome verification references missing justfile recipe: {command}",
+            )
+        )
+    for message in missing_maven_commands(root, verification_command):
+        findings.append(Finding(path, f"task outcome verification {message}"))
+    for message in missing_gradle_commands(root, verification_command):
+        findings.append(Finding(path, f"task outcome verification {message}"))
+    for message in missing_go_commands(root, verification_command):
+        findings.append(Finding(path, f"task outcome verification {message}"))
 
     truthy_include_fields = [
         field
@@ -790,7 +1053,9 @@ def check_effectiveness_plan(root: Path, require_report: bool) -> int:
             findings.extend(validate_effectiveness_report(path, text))
 
     for path in iter_task_outcomes(root):
-        findings.extend(validate_task_outcome(path, path.read_text(encoding="utf-8")))
+        findings.extend(
+            validate_task_outcome(root, path, path.read_text(encoding="utf-8"))
+        )
 
     for finding in findings:
         print(f"{finding.path.relative_to(root)}: {finding.message}")

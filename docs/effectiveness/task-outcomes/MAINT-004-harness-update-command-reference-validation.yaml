@@ -1,0 +1,83 @@
+schema_version: 1
+
+target:
+  repository: harness-erp
+  repository_ref: a831d963f1f0fd63e95e2680d8a8327bb61d0c86
+  stack_or_framework: Java 21 / Spring Boot 4.0.6
+  date: 2026-06-10
+  agent_or_model: Codex in Codex desktop
+  reviewer: Codex in Codex desktop
+
+task:
+  id: MAINT-004
+  run_id: MAINT-004-2026-06-10
+  prompt_summary: Run /harness update, adopt the starter kit command-reference and failure-memory validation updates, and refresh source tracking.
+  prompt_ref: /Users/wb/Desktop/harness-starter-kit/commands/harness-update.md
+  prompt_hash: sha256:94e2dec52e21e00ec5db0321f5b3b87093c71c9aa1302a842bde751b63217b7a
+  comparable_task_group: non-comparable-maintenance
+  condition: non-comparable-maintenance
+  start_ref: a831d963f1f0fd63e95e2680d8a8327bb61d0c86
+  expected_boundary:
+    - .harness/source.json
+    - README.md
+    - scripts/check_harness.py
+    - scripts/check_docs_drift.py
+    - scripts/check_effectiveness_plan.py
+    - scripts/check_failure_memory.py
+    - docs/harness/adoption-report.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/MAINT-004-harness-update-command-reference-validation.yaml
+  known_failure_mode: Harness update refreshes source tracking but skips target-adapted checker updates; failure memory records lack concrete detection checks; stale command references point to missing wrappers, package scripts, or project markers.
+
+harness_context:
+  harness_doctor_score: 64/100 diagnostic-only
+  harness_source:
+    kit_url: https://github.com/harnessworks/harness-starter-kit.git
+    previous_kit_commit: 416409d6ab611e23ba73355d539198025fef5ad5
+    kit_commit: de0737abf3808ecbd7eae50fcc7fab119594bd0d
+    source_tracking_ref: .harness/source.json
+  relevant_instructions:
+    - AGENTS.md
+    - /Users/wb/Desktop/harness-starter-kit/commands/harness-update.md
+  relevant_constraints:
+    - scripts/check_harness.py
+    - scripts/check_docs_drift.py
+    - scripts/check_effectiveness_plan.py
+    - scripts/check_failure_memory.py
+  relevant_memory_records:
+    - docs/failures/0001-spring-boot-coordinate-resolution.md
+    - docs/failures/0002-task-outcome-reviewer-evidence-gap.md
+
+outcome:
+  files_changed:
+    - .harness/source.json
+    - README.md
+    - scripts/check_harness.py
+    - scripts/check_docs_drift.py
+    - scripts/check_effectiveness_plan.py
+    - scripts/check_failure_memory.py
+    - docs/harness/adoption-report.md
+    - docs/effectiveness/effectiveness-report.md
+    - docs/effectiveness/task-outcomes/MAINT-004-harness-update-command-reference-validation.yaml
+  wrong_file_edits: false
+  repeated_known_mistake: false
+  verification_command: python scripts/check_harness.py
+  first_pass_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+    relevant_output: "Maven tests passed with Tests run: 61, Failures: 0, Errors: 0, Skipped: 0; docs drift, structure, effectiveness, and failure-memory checks completed successfully."
+  final_verification:
+    command: python scripts/check_harness.py
+    exit_code: 0
+    result: pass
+  drift_violations_detected: []
+  human_rework_minutes: unknown
+  reverted_files: []
+  notes: This maintenance run updates harness source tracking and validation only. Latest Harness Doctor reported 64/100 as diagnostic-only evidence with coupling warnings; it is not a completion gate, does not claim harness effectiveness improvement, and does not alter comparable product behavior.
+
+follow_up:
+  harness_change_needed: false
+  decision_or_failure_record: none
+  include_in_effectiveness_report: true
+  include_in_comparable_product_task_count: false

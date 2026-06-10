@@ -1,11 +1,11 @@
 {
   "kit_path": "/Users/wb/Desktop/harness-starter-kit",
-  "kit_url": "https://github.com/baskduf/harness-starter-kit.git",
-  "kit_remote": "https://github.com/baskduf/harness-starter-kit.git",
-  "kit_commit": "416409d6ab611e23ba73355d539198025fef5ad5",
+  "kit_url": "https://github.com/harnessworks/harness-starter-kit.git",
+  "kit_remote": "https://github.com/harnessworks/harness-starter-kit.git",
+  "kit_commit": "de0737abf3808ecbd7eae50fcc7fab119594bd0d",
   "applied_profile": "spring",
   "adopted_at": "2026-06-06",
-  "updated_at": "2026-06-06",
+  "updated_at": "2026-06-10",
   "update_command": "/harness update",
   "setup_prompt": "/Users/wb/Desktop/prompt/00-setup-only.md",
   "source_tracking_ref": ".harness/source.json"

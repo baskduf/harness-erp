@@ -40,7 +40,7 @@ python scripts/check_harness.py
 ```
 
 The harness gate runs Maven tests, documentation drift checks, project
-structure checks, and effectiveness evidence checks.
+structure checks, effectiveness evidence checks, and failure-memory checks.
 
 For product-behavior debugging, Maven tests can also be run directly:
 
@@ -112,7 +112,7 @@ Harness source tracking and task evidence are kept in:
 
 ERP-001 through ERP-005 are the initial comparable benchmark. ERP-006 through
 ERP-010 are tracked separately as `harness-erp-follow-up-benchmark`. MAINT-001
-through MAINT-003 are non-comparable maintenance and are excluded from
+through MAINT-004 are non-comparable maintenance and are excluded from
 comparable product-task counts. FE-001 through FE-005 are tracked separately as
 `harness-erp-frontend-follow-up`.
 

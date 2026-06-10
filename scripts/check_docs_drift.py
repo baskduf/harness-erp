@@ -23,6 +23,7 @@ REQUIRED_FILES = [
     "docs/effectiveness/effectiveness-report.md",
     "docs/effectiveness/task-outcomes/task-outcome-template.yaml",
     "scripts/check_effectiveness_plan.py",
+    "scripts/check_failure_memory.py",
 ]
 
 
@@ -39,6 +40,9 @@ def main() -> int:
     source = json.loads((ROOT / ".harness/source.json").read_text(encoding="utf-8"))
     expected_source = {
         "kit_path": "/Users/wb/Desktop/harness-starter-kit",
+        "kit_url": "https://github.com/harnessworks/harness-starter-kit.git",
+        "kit_remote": "https://github.com/harnessworks/harness-starter-kit.git",
+        "kit_commit": "de0737abf3808ecbd7eae50fcc7fab119594bd0d",
         "applied_profile": "spring",
         "setup_prompt": "/Users/wb/Desktop/prompt/00-setup-only.md",
         "source_tracking_ref": ".harness/source.json",
@@ -61,6 +65,8 @@ def main() -> int:
         "ERP-003",
         "ERP-004",
         "ERP-005",
+        "MAINT-004",
+        "de0737abf3808ecbd7eae50fcc7fab119594bd0d",
         "unknown",
     ]
     for expected_text in required_effectiveness_text:
@@ -72,7 +78,9 @@ def main() -> int:
     )
     required_adoption_text = [
         "python scripts/check_effectiveness_plan.py",
+        "python scripts/check_failure_memory.py",
         "387dbfabda3d63975494bdabfc812ddf64100919",
+        "de0737abf3808ecbd7eae50fcc7fab119594bd0d",
         "/harness update",
     ]
     for expected_text in required_adoption_text:

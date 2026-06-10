@@ -34,6 +34,7 @@ def main() -> int:
     run([sys.executable, "scripts/check_docs_drift.py"])
     run([sys.executable, "scripts/check_structure.py"])
     run([sys.executable, "scripts/check_effectiveness_plan.py"])
+    run([sys.executable, "scripts/check_failure_memory.py"])
     return 0
 
 

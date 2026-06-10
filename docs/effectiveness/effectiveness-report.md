@@ -11,8 +11,8 @@
 ## Harness Source
 
 - Kit path: `/Users/wb/Desktop/harness-starter-kit`
-- Kit remote: `https://github.com/baskduf/harness-starter-kit.git`
-- Kit commit: `416409d6ab611e23ba73355d539198025fef5ad5`
+- Kit remote: `https://github.com/harnessworks/harness-starter-kit.git`
+- Kit commit: `de0737abf3808ecbd7eae50fcc7fab119594bd0d`
 - Applied profile: `spring`
 - Source tracking: `.harness/source.json`
 
@@ -113,6 +113,7 @@ without a comparison point.
 | MAINT-001-ci-verification | Added GitHub Actions CI for the local harness gate as operational maintenance evidence | Excluded from comparable product-task count |
 | MAINT-002-frontend-design-baseline | Added the legacy ERP frontend design convention before measurable frontend product tasks | Excluded from comparable product-task count |
 | MAINT-003-harness-update-evidence-gate | Refreshed harness-starter-kit source tracking to kit commit `416409d6ab611e23ba73355d539198025fef5ad5`, adopted the stricter included-outcome evidence gate, and normalized included task outcome reviewers | Excluded from comparable product-task count |
+| MAINT-004-harness-update-command-reference-validation | Refreshed harness-starter-kit source tracking to canonical kit commit `de0737abf3808ecbd7eae50fcc7fab119594bd0d`, adopted stricter command-reference validation, and added failure-memory validation to the normal gate | Excluded from comparable product-task count |
 
 ## Run Log
 
@@ -138,6 +139,7 @@ without a comparison point.
 | harnessed-only | FE-004 | 1 | first pass and final pass | Connected Approval Queue and Approval History to real approval APIs with MANAGER decisions and persisted comments; frontend follow-up group only |
 | harnessed-only | FE-005 | 1 | first pass and final pass | Added full frontend API coverage static-resource evidence and smoke-verified every README API; frontend follow-up group only |
 | non-comparable-maintenance | MAINT-003 | 1 | first pass failed, final pass | Adopted the starter kit evidence gate and source tracking update; first pass exposed existing included outcome reviewer placeholders; not counted as comparable product work |
+| non-comparable-maintenance | MAINT-004 | 1 | first pass and final pass | Adopted the starter kit command-reference and failure-memory validation update; not counted as comparable product work |
 
 ## Changed-Files Consistency
 
@@ -161,6 +163,7 @@ without a comparison point.
 | FE-004 | Static frontend resources, optional approval static-resource test, README if needed, effectiveness report, FE-004 task outcome | `README.md`, static `index.html`, `app.js`, `ApprovalFrontendStaticResourceTest`, effectiveness report, FE-004 task outcome | false |
 | FE-005 | Static frontend resources if gaps are found, optional full coverage static-resource test, README if needed, effectiveness report, FE-005 task outcome | `FullFrontendApiCoverageStaticResourceTest`, effectiveness report, FE-005 task outcome | false |
 | MAINT-003 | Source tracking, harness evidence gate, failure memory, effectiveness report, and task outcome reviewer evidence | `.harness/source.json`, `AGENTS.md`, `scripts/check_effectiveness_plan.py`, `docs/failures/0002-task-outcome-reviewer-evidence-gap.md`, effectiveness report, included task outcome reviewer fields, MAINT-003 task outcome | false |
+| MAINT-004 | Source tracking, command-reference validation, failure-memory validation, docs drift check, README, adoption report, effectiveness report, and MAINT-004 task outcome | `.harness/source.json`, `README.md`, `scripts/check_harness.py`, `scripts/check_docs_drift.py`, `scripts/check_effectiveness_plan.py`, `scripts/check_failure_memory.py`, adoption report, effectiveness report, MAINT-004 task outcome | false |
 
 ## Source Records
 
@@ -192,6 +195,7 @@ without a comparison point.
   - FE-004 start ref: `4b906d7125e7c3163b455546ced2c7d46b988a8c`
   - FE-005 start ref: `2907544e9aab0ddecb545dee5b9336b0a27af953`
   - MAINT-003 start ref: `0192d962961427a49c20210b5692aa76ac96d6bd`
+  - MAINT-004 start ref: `a831d963f1f0fd63e95e2680d8a8327bb61d0c86`
 - Prompt refs compared:
   - `/Users/wb/Desktop/prompt/00-setup-only.md`
   - `/Users/wb/Desktop/prompt/01-erp-001-employee-search.md`
@@ -215,6 +219,7 @@ without a comparison point.
   - `docs/effectiveness/task-outcomes/MAINT-001-ci-verification.yaml`
   - `docs/effectiveness/task-outcomes/MAINT-002-frontend-design-baseline.yaml`
   - `docs/effectiveness/task-outcomes/MAINT-003-harness-update-evidence-gate.yaml`
+  - `docs/effectiveness/task-outcomes/MAINT-004-harness-update-command-reference-validation.yaml`
 - Frontend follow-up task outcome records reviewed:
   - `docs/effectiveness/task-outcomes/FE-001-vanilla-frontend-shell.yaml`
   - `docs/effectiveness/task-outcomes/FE-002-employee-management-frontend.yaml`
@@ -223,6 +228,7 @@ without a comparison point.
   - `docs/effectiveness/task-outcomes/FE-005-full-frontend-api-verification.yaml`
 - Maintenance verification commands:
   - `python scripts/check_harness.py`
+  - `python scripts/check_failure_memory.py`
   - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_effectiveness_plan.py`
   - `python /Users/wb/Desktop/harness-starter-kit/scripts/check_failure_memory.py`
 - Failure memory records reviewed:
@@ -275,6 +281,10 @@ without a comparison point.
 - Harness maintenance update: MAINT-003 refreshed source tracking to kit commit
   `416409d6ab611e23ba73355d539198025fef5ad5` and adopted the stricter included
   task outcome evidence gate. This is non-comparable maintenance evidence only.
+- Harness maintenance update: MAINT-004 refreshed source tracking to canonical
+  kit commit `de0737abf3808ecbd7eae50fcc7fab119594bd0d`, adopted stricter
+  command-reference validation, and added failure-memory validation to the
+  normal gate. This is non-comparable maintenance evidence only.
 - Frontend API coverage summary: all README APIs were covered in FE-005 smoke:
   `POST /employees`, `PUT /employees/{employeeId}`, `GET /employees`,
   `GET /employees?name={name}`, `GET /employees/{employeeId}`,
@@ -296,8 +306,10 @@ without a comparison point.
 - Non-comparable maintenance: MAINT-001 added CI verification for the local
   harness gate. MAINT-002 added the legacy ERP frontend design baseline before
   measurable frontend work. MAINT-003 updated harness source tracking and
-  evidence validation. These are operational and documentation evidence only,
-  do not use secrets, and do not increment comparable product-task counts.
+  evidence validation. MAINT-004 updated canonical source tracking and added
+  command-reference and failure-memory validation. These are operational and
+  documentation evidence only, do not use secrets, and do not increment
+  comparable product-task counts.
 - Harness changes to make next: review the completed task outcomes with a human
   reviewer if human rework minutes or qualitative review findings are needed.
 - Human rework interpretation: `unknown` is distinct from `0`; use `unknown`
